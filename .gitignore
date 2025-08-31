@@ -1,0 +1,22 @@
+# Maven
+target/
+*.class
+*.jar
+*.war
+*.ear
+
+# Node
+node_modules/
+dist/
+
+# IDE files
+.idea/
+.vscode/
+*.iml
+
+# Logs
+logs/
+*.log
+
+# OS files
+.DS_Store
