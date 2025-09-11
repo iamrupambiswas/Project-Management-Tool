@@ -42,16 +42,18 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.csrf().disable()
-                .authorizeHttpRequests()
-                .requestMatchers(
-                        "/api/auth/**",        // auth APIs open
-                        "/swagger-ui/**",      // swagger UI resources
-                        "/swagger-ui.html",    // old swagger UI path
-                        "/v3/api-docs/**"      // OpenAPI docs
-                ).permitAll()
-                .anyRequest().authenticated()
-                .and()
+        http
+                .csrf(csrf -> csrf.disable()) // disable CSRF for APIs
+                .cors(cors -> {})             // 👈 enable CORS (uses your CorsConfig)
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(
+                                "/api/auth/**",        // auth APIs open
+                                "/swagger-ui/**",      // swagger UI resources
+                                "/swagger-ui.html",    // old swagger UI path
+                                "/v3/api-docs/**"      // OpenAPI docs
+                        ).permitAll()
+                        .anyRequest().authenticated()
+                )
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
