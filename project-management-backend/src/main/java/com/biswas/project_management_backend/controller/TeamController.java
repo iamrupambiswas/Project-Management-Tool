@@ -1,5 +1,6 @@
 package com.biswas.project_management_backend.controller;
 
+import com.biswas.project_management_backend.dto.InviteRequest;
 import com.biswas.project_management_backend.dto.TeamDto;
 import com.biswas.project_management_backend.service.TeamService;
 import lombok.RequiredArgsConstructor;
@@ -33,10 +34,11 @@ public class TeamController {
         return ResponseEntity.ok(teamService.getTeam(id));
     }
 
-    // Add member to team
-    @PostMapping("/{teamId}/members/{userId}")
-    public ResponseEntity<TeamDto> addMember(@PathVariable Long teamId, @PathVariable Long userId) {
-        return ResponseEntity.ok(teamService.addMember(teamId, userId));
+    @PostMapping("/{teamId}/members")
+    public ResponseEntity<TeamDto> addMember(
+            @PathVariable Long teamId,
+            @RequestBody InviteRequest inviteRequest) {
+        return ResponseEntity.ok(teamService.addMember(teamId, inviteRequest));
     }
 
     // Remove member from team

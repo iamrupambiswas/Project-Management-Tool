@@ -1,3 +1,52 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/*
+  ---------------------------------
+  Global Styles & Custom Utilities
+  ---------------------------------
+*/
+
+/* Reset browser defaults */
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Custom Animation for Cyber Background */
+@keyframes cyber-grid {
+  0% {
+    background-position: 0% 0%;
+  }
+  100% {
+    background-position: 100% 100%;
+  }
+}
+
+.cyber-background {
+  background:
+    /* A darker, more transparent overlay to make the grid pop */
+    linear-gradient(rgba(0, 0, 0, 0.95), rgba(0, 0, 0, 0.95)),
+    /* The grid lines are now a brighter, vibrant blue */
+    repeating-linear-gradient(0deg, #00C0FF, #00C0FF 1px, transparent 1px, transparent 40px),
+    repeating-linear-gradient(90deg, #00C0FF, #00C0FF 1px, transparent 1px, transparent 40px);
+  background-size: 40px 40px;
+  animation: cyber-grid 60s linear infinite;
+  background-color: #0A0B1A;
+}
+
+/*
+  ---------------------------------
+  (Optional) Other custom styles
+  ---------------------------------
+*/
+
+/* Example: Custom utility for glowing text */
+.text-glow-sm {
+  text-shadow: 0 0 5px rgba(0, 192, 255, 0.5);
+}
+
+/* Add any other custom styles you might have here */

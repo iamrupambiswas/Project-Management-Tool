@@ -1,5 +1,6 @@
 package com.biswas.project_management_backend.service;
 
+import com.biswas.project_management_backend.dto.InviteRequest;
 import com.biswas.project_management_backend.dto.TeamDto;
 import com.biswas.project_management_backend.model.Team;
 import com.biswas.project_management_backend.model.User;
@@ -35,10 +36,10 @@ public class TeamService {
     }
 
     // ---------------- ADD MEMBER ----------------
-    public TeamDto addMember(Long teamId, Long userId) {
+    public TeamDto addMember(Long teamId, InviteRequest inviteRequest) {
         Team team = teamRepository.findById(teamId)
                 .orElseThrow(() -> new RuntimeException("Team not found"));
-        User user = userRepository.findById(userId)
+        User user = userRepository.findByEmail(inviteRequest.getEmail())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         team.getMembers().add(user);

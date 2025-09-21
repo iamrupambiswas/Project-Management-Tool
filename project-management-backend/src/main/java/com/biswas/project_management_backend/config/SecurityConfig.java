@@ -4,6 +4,7 @@ import com.biswas.project_management_backend.security.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -46,12 +47,10 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable()) // disable CSRF for APIs
                 .cors(cors -> {})             // 👈 enable CORS (uses your CorsConfig)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
-                                "/api/auth/**",        // auth APIs open
-                                "/swagger-ui/**",      // swagger UI resources
-                                "/swagger-ui.html",    // old swagger UI path
-                                "/v3/api-docs/**"      // OpenAPI docs
-                        ).permitAll()
+                        .requestMatchers("/api/auth/**", "/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/teams/**").authenticated()   // all logged in users can view
+                        .requestMatchers(HttpMethod.POST, "/api/teams/**").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "/api/teams/**").hasRole("ADMIN") // only Admin can delete
                         .anyRequest().authenticated()
                 )
                 .authenticationProvider(authenticationProvider())
