@@ -1,5 +1,6 @@
 import './App.css';
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { useAuthStore } from "./store/authStore";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -10,14 +11,17 @@ import Topbar from "./components/Topbar";
 import './index.css'
 
 function App() {
-  const isAuthenticated = true; // Placeholder: Replace with your actual auth check
+  const isAuthenticated = useAuthStore((state) => state.token);
+  const location = useLocation();
+
+  const hideLayout = location.pathname === "/login" || location.pathname === "/register";
 
   return (
     <div className="flex h-screen bg-background-dark text-text-base">
-      {isAuthenticated && <Sidebar />}
+      {isAuthenticated && !hideLayout && <Sidebar />}
 
       <div className="flex-1 flex flex-col overflow-hidden">
-        {isAuthenticated && <Topbar />}
+        {isAuthenticated && !hideLayout && <Topbar />}
 
         <main className="flex-1 overflow-y-auto bg-background-content">
           <Routes>

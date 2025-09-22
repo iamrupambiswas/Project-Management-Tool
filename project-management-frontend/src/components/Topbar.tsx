@@ -1,11 +1,23 @@
 import { Bell } from "lucide-react";
 import { Link } from "react-router-dom"; 
+import { useLocation } from "react-router-dom";
 
 export default function Topbar() {
+
+  const location = useLocation();
+  const pageTitles: Record<string, string> = {
+    "/dashboard" : "Dashboard",
+    "/teams" : "Teams",
+    "/members" : "Members",
+    "/projects" : "Projects",
+    "/tasks" : "Tasks"
+  }
+  const title = pageTitles[location.pathname] || "Page";
+
   return (
     <header className="h-14 md:h-16 bg-background-light text-text-base font-sans shadow-md flex items-center justify-between px-4 md:px-6 border-b border-background-dark">
       <h1 className="text-xl md:text-2xl font-bold text-accent-blue">
-        Dashboard
+        {title}
       </h1>
       <div className="flex items-center gap-4 md:gap-6">
         <div className="relative">

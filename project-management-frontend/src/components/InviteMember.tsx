@@ -7,7 +7,7 @@ import { X } from "lucide-react";
 interface InviteMemberProps {
   teamId: string;
   onClose: () => void;
-  onMemberAdded: () => void;
+  onMemberAdded: (newMemberName: string) => void;
 }
 
 export default function InviteMember({ teamId, onClose, onMemberAdded }: InviteMemberProps) {
@@ -27,11 +27,12 @@ export default function InviteMember({ teamId, onClose, onMemberAdded }: InviteM
     setInviteError("");
     try {
       setLoading(true);
-      await addTeamMember(teamId, { email, role });
+      const result = await addTeamMember(teamId, { email, role });
+      const newMemberName = result.username || email;
       toast.success("Invitation sent!");
       setEmail("");
       setRole("MEMBER");
-      onMemberAdded();
+      onMemberAdded(newMemberName);
     } catch (error: any) {
       console.error("Invite failed:", error);
       const errorMessage = error.response?.data?.message || "Failed to invite member. Please try again.";

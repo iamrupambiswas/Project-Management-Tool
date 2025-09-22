@@ -1,4 +1,4 @@
-import { Home, FolderKanban, Users, CheckSquare, LogOut } from "lucide-react";
+import { Home, FolderKanban, Users, CheckSquare, LogOut, User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/authStore";
 import NavItem from "./NavItem";
@@ -32,6 +32,11 @@ export default function Sidebar() {
           icon={<CheckSquare size={16} md:size={18} />}
           label="Tasks"
           onClick={() => navigate("/tasks")}
+        />
+        <NavItem
+          icon={<User size={16} />}
+          label="Members"
+          onClick={() => navigate("/members")}
         />
       </nav>
       <div className="p-3 md:p-4">

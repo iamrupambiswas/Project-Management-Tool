@@ -8,7 +8,7 @@ interface Team {
   id: number;
   name: string;
   description: string;
-  members: number;
+  members: string[];
 }
 
 const LoadingSpinner = () => (
@@ -40,6 +40,7 @@ export default function Teams() {
 
   useEffect(() => {
     getTeams().then((data) => {
+      console.log(data);
       setTeams(data);
       setLoading(false);
     });
@@ -65,8 +66,7 @@ export default function Teams() {
 
   return (
     <div className="p-6 min-h-screen text-text-base font-sans relative">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-xl md:text-2xl font-bold text-text-base">Teams</h1>
+      <div className="flex justify-end items-center mb-6">
         <button className="flex items-center gap-2 bg-accent-blue text-text-base px-3 py-1 rounded-md transition-colors hover:bg-opacity-80 text-sm">
           <PlusCircle size={16} />
           <span className="hidden md:inline">Create Team</span>
@@ -81,7 +81,7 @@ export default function Teams() {
           {teams.map((team) => (
             <li
               key={team.id}
-              className="p-4 bg-background-light border border-background-dark rounded-xl shadow-lg transition-transform hover:scale-[1.02] duration-300"
+              className="p-4 bg-background-light border border-background-dark rounded-xl shadow-lg transition-colors hover:border-accent-blue duration-300"
             >
               <h2 className="text-base md:text-lg font-semibold text-text-base mb-1">
                 {team.name}
@@ -89,9 +89,22 @@ export default function Teams() {
               <p className="text-xs md:text-sm text-text-muted mb-2">
                 {team.description}
               </p>
-              <p className="text-xs text-accent-blue">
-                Members: {team.members}
+              <p className="text-xs text-accent-blue mb-2">
+                Members: {team.members.length}
               </p>
+              <ul className="flex flex-wrap gap-2 text-xs text-text-muted">
+                {team.members.slice(0, 3).map((name, idx) => (
+                  <li
+                    key={idx}
+                    className="px-2 py-1 bg-background-dark rounded-md"
+                  >
+                    {name}
+                  </li>
+                ))}
+                {team.members.length > 3 && (
+                  <li className="px-2 py-1 text-accent-blue">+{team.members.length - 3} more</li>
+                )}
+              </ul>
               <button
                 onClick={() => handleOpenInvite(team.id)}
                 className="mt-3 px-3 py-1 bg-accent-blue text-text-base rounded-md transition-colors hover:bg-opacity-80 text-xs font-semibold w-full"
@@ -108,11 +121,11 @@ export default function Teams() {
           <InviteMember
             teamId={selectedTeamId.toString()}
             onClose={handleCloseInvite}
-            onMemberAdded={() => {
+            onMemberAdded={(newMemberName: string) => {
               setTeams((prev) =>
                 prev.map((t) =>
                   t.id === selectedTeamId
-                    ? { ...t, members: t.members + 1 }
+                    ? { ...t, members: [...t.members, newMemberName] }
                     : t
                 )
               );
