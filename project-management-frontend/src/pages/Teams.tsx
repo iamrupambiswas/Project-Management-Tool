@@ -3,13 +3,9 @@ import { getTeams } from "../services/teamService";
 import InviteMember from "../components/InviteMember";
 import { PlusCircle, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
+import CreateTeamModal from "../components/CreateTeamModal";
+import type { TeamDto } from "../api/models/TeamDto";
 
-interface Team {
-  id: number;
-  name: string;
-  description: string;
-  members: string[];
-}
 
 const LoadingSpinner = () => (
   <motion.div
@@ -33,10 +29,11 @@ const LoadingSpinner = () => (
 );
 
 export default function Teams() {
-  const [teams, setTeams] = useState<Team[]>([]);
+  const [teams, setTeams] = useState<TeamDto[]>([]);
   const [loading, setLoading] = useState(true);
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [selectedTeamId, setSelectedTeamId] = useState<number | null>(null);
+  const [showCreateModal, setShowCreateModal] = useState(false);
 
   useEffect(() => {
     getTeams().then((data) => {
@@ -67,10 +64,19 @@ export default function Teams() {
   return (
     <div className="p-6 min-h-screen text-text-base font-sans relative">
       <div className="flex justify-end items-center mb-6">
-        <button className="flex items-center gap-2 bg-accent-blue text-text-base px-3 py-1 rounded-md transition-colors hover:bg-opacity-80 text-sm">
+        <button 
+        onClick={() => setShowCreateModal(true)}
+        className="flex items-center gap-2 bg-accent-blue text-text-base px-3 py-1 rounded-md transition-colors hover:bg-opacity-80 text-sm">
           <PlusCircle size={16} />
           <span className="hidden md:inline">Create Team</span>
         </button>
+        
+{showCreateModal && (
+  <CreateTeamModal
+    onClose={() => setShowCreateModal(false)}
+    onTeamCreated={(newTeam) => setTeams((prev) => [...prev, newTeam])}
+  />
+)}
       </div>
       {teams.length === 0 ? (
         <p className="text-text-muted text-sm text-center">

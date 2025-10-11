@@ -9,6 +9,8 @@ import Teams from "./pages/Teams";
 import Sidebar from "./components/Sidebar";
 import Topbar from "./components/Topbar";
 import './index.css'
+import Members from './pages/Members';
+import Projects from './pages/Projects';
 
 function App() {
   const isAuthenticated = useAuthStore((state) => state.token);
@@ -41,6 +43,18 @@ function App() {
               element={
                 <ProtectedRoute>
                   <Teams />
+                </ProtectedRoute>
+              }
+            />
+            <Route 
+              path="/members" 
+              element={<Members />} 
+            />
+            <Route
+              path="/projects"
+              element={
+                <ProtectedRoute>
+                  <Projects />
                 </ProtectedRoute>
               }
             />

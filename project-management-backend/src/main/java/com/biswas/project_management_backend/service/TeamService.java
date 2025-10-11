@@ -2,6 +2,7 @@ package com.biswas.project_management_backend.service;
 
 import com.biswas.project_management_backend.dto.InviteRequest;
 import com.biswas.project_management_backend.dto.TeamDto;
+import com.biswas.project_management_backend.model.Role;
 import com.biswas.project_management_backend.model.Team;
 import com.biswas.project_management_backend.model.User;
 import com.biswas.project_management_backend.repository.TeamRepository;
@@ -26,9 +27,15 @@ public class TeamService {
             throw new RuntimeException("Team name already exists");
         }
 
+        Set<User> teamMembers = dto.getMembers().stream()
+                .map(email -> userRepository.findByEmail(email)
+                        .orElseThrow(() -> new RuntimeException("User not found: " + email)))
+                .collect(Collectors.toSet());
+
         Team team = Team.builder()
                 .name(dto.getName())
                 .description(dto.getDescription())
+                .members(teamMembers)
                 .build();
 
         Team saved = teamRepository.save(team);
@@ -81,9 +88,11 @@ public class TeamService {
                 .name(team.getName())
                 .description(team.getDescription())
                 .members(
-                        team.getMembers().stream()
-                                .map(User::getUsername) // or user.getEmail()
-                                .collect(Collectors.toSet())
+                        team.getMembers() == null ?
+                                Set.of() :
+                                team.getMembers().stream()
+                                        .map(User::getUsername)
+                                        .collect(Collectors.toSet())
                 )
                 .build();
     }

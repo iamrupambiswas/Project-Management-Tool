@@ -4,6 +4,7 @@ import com.biswas.project_management_backend.dto.AuthRequestDto;
 import com.biswas.project_management_backend.dto.AuthResponseDto;
 import com.biswas.project_management_backend.dto.RegisterRequestDto;
 import com.biswas.project_management_backend.dto.UserDto;
+import com.biswas.project_management_backend.dto.mapper.UserDtoMapper;
 import com.biswas.project_management_backend.model.Role;
 import com.biswas.project_management_backend.model.User;
 import com.biswas.project_management_backend.repository.RoleRepository;
@@ -15,6 +16,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -29,6 +31,7 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
     private final AuthenticationManager authenticationManager;
+    private final UserDtoMapper userDtoMapper;
 
     // ---------------- AUTH ----------------
     public User registerUser(RegisterRequestDto request) {
@@ -58,33 +61,31 @@ public class UserService {
 
     // ---------------- CRUD ----------------
     public UserDto createUser(UserDto dto, String rawPassword) {
-        Set<Role> roles = dto.getRoles().stream()
-                .map(roleName -> roleRepository.findByName(roleName)
-                        .orElseThrow(() -> new RuntimeException("Role not found: " + roleName)))
-                .collect(Collectors.toSet());
 
         User user = User.builder()
                 .username(dto.getUsername())
                 .email(dto.getEmail())
                 .password(passwordEncoder.encode(rawPassword))
-                .roles(roles)
+                .roles(dto.getRoles())
                 .build();
 
         User saved = userRepository.save(user);
-        return mapToDto(saved);
+        return userDtoMapper.toDto(saved);
     }
 
     public List<UserDto> getAllUsers() {
-        return userRepository.findAll()
-                .stream()
-                .map(this::mapToDto)
-                .collect(Collectors.toList());
+        List<User> users = userRepository.findAll();
+        List<UserDto> userDtos = new ArrayList<>();
+        for(User user: users){
+            UserDto userDto = userDtoMapper.toDto(user);
+            userDtos.add(userDto);
+        }
+        return userDtos;
     }
 
     public UserDto getUser(Long id) {
-        return userRepository.findById(id)
-                .map(this::mapToDto)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        User user = userRepository.getById(id);
+        return userDtoMapper.toDto(user);
     }
 
     public UserDto updateUser(Long id, UserDto dto) {
@@ -93,30 +94,14 @@ public class UserService {
 
         user.setUsername(dto.getUsername());
         user.setEmail(dto.getEmail());
-
-        if (dto.getRoles() != null) {
-            Set<Role> roles = dto.getRoles().stream()
-                    .map(roleName -> roleRepository.findByName(roleName)
-                            .orElseThrow(() -> new RuntimeException("Role not found: " + roleName)))
-                    .collect(Collectors.toSet());
-            user.setRoles(roles);
-        }
+        user.setRoles(dto.getRoles());
 
         User updated = userRepository.save(user);
-        return mapToDto(updated);
+        return userDtoMapper.toDto(updated);
     }
 
     public void deleteUser(Long id) {
         userRepository.deleteById(id);
     }
 
-    // ---------------- MAPPER ----------------
-    private UserDto mapToDto(User user) {
-        return UserDto.builder()
-                .id(user.getId())
-                .username(user.getUsername())
-                .email(user.getEmail())
-                .roles(user.getRoles().stream().map(Role::getName).collect(Collectors.toSet()))
-                .build();
-    }
 }
