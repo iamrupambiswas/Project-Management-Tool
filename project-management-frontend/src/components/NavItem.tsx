@@ -1,8 +1,17 @@
+import { ReactNode, MouseEventHandler } from "react";
 import { useLocation } from "react-router-dom";
 
-export default function NavItem({ icon, label, onClick }) {
+interface NavItemProps {
+  icon: ReactNode; // any valid JSX / component
+  label: string;
+  onClick?: MouseEventHandler<HTMLButtonElement>; // optional click handler
+}
+
+export default function NavItem({ icon, label, onClick }: NavItemProps) {
   const location = useLocation();
-  const isActive = location.pathname === `/${label.toLowerCase()}` || (label === "Dashboard" && location.pathname === "/");
+  const isActive =
+    location.pathname === `/${label.toLowerCase()}` ||
+    (label === "Dashboard" && location.pathname === "/");
 
   return (
     <button
@@ -16,9 +25,7 @@ export default function NavItem({ icon, label, onClick }) {
         }
       `}
     >
-      <div className="text-sm md:text-xl">
-        {icon}
-      </div>
+      <div className="text-sm md:text-xl">{icon}</div>
       <span className="text-xs md:text-sm font-medium">{label}</span>
     </button>
   );

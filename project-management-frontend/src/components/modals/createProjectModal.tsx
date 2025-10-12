@@ -1,8 +1,7 @@
-// src/components/Modals/CreateProjectModal.tsx
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { Loader2, PlusCircle } from "lucide-react";
-import type { ProjectDto as Project } from "../../api/models/ProjectDto";
+import type { ProjectDto as Project } from "../../@api/models";
 
 interface CreateProjectModalProps {
   onClose: () => void;
@@ -15,7 +14,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ onClose, onProj
   const [leadName, setLeadName] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     // TODO: API call to create project
     // Simulated creation for now
@@ -23,12 +22,11 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ onClose, onProj
       id: Date.now(),
       name,
       description,
-      leadName,
       status: 'PLANNING',
       team: { id: 1, name: leadName },
       taskCount: 0,
       memberCount: 1,
-      startDate: new Date().toISOString().split('T')[0],
+      startDate: new Date(),
     };
     onProjectCreated(newProject);
     onClose();

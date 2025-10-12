@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { PlusCircle, Loader2, FolderOpen, CheckCircle, BarChart2, Calendar, Users } from "lucide-react";
 import { motion } from "framer-motion";
-import type { ProjectDto as Project } from "../api/models/ProjectDto";
+import type { ProjectDto as Project } from "../@api/models";
 import { getAllProjects } from "../services/projectService";
-import CreateProjectModal from "../components/Modals/CreateProjectModal";
+import CreateProjectModal from "../components/modals/CreateProjectModal";
 
 
 const LoadingSpinner = () => (
@@ -102,7 +102,7 @@ export default function Projects() {
                     <FolderOpen size={36} className="text-accent-green flex-shrink-0 hidden sm:block" />
                     <div>
                         <h2 className="text-base md:text-lg font-semibold text-text-base mb-0.5">{project.name}</h2>
-                        <p className="text-xs text-text-muted">Team: <span className="font-medium text-text-base">{project.team.name}</span></p>
+                        <p className="text-xs text-text-muted">Team: <span className="font-medium text-text-base">{project.team?.name ?? "N/A"}</span></p>
                     </div>
                   </div>
                   <p className="text-xs text-text-muted mt-1 md:ml-14 line-clamp-2">{project.description}</p>
@@ -112,7 +112,7 @@ export default function Projects() {
                   
                   <span className={`px-3 py-1 text-xs font-medium rounded-full border ${getStatusClasses(project.status)} min-w-[75px] text-center`}>
                     {/* The replace is necessary because the status is likely ALL_CAPS with underscores from the Java enum */}
-                    {project.status.replace('_', ' ')}
+                    {project.status?.replace('_', ' ')}
                   </span>
                   
                   <div className="flex items-center gap-1 text-text-muted text-xs">
@@ -127,7 +127,7 @@ export default function Projects() {
                   
                   <div className="text-xs text-text-muted flex items-center gap-1">
                     <Calendar size={14} className="text-text-muted"/>
-                    Start: <span className="font-medium text-text-base">{project.startDate}</span>
+                    Start: <span className="font-medium text-text-base">{project.startDate?.toDateString()}</span>
                   </div>
 
                 </div>

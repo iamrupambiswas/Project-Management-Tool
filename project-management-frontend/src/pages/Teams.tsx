@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { getTeams } from "../services/teamService";
-import InviteMember from "../components/Modals/InviteMember";
+import InviteMember from "../components/modals/InviteMember";
 import { PlusCircle, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
-import CreateTeamModal from "../components/Modals/CreateTeamModal";
-import type { TeamDto } from "../api/models/TeamDto";
+import CreateTeamModal from "../components/modals/CreateTeamModal";
+import type { TeamDto } from "../@api/models";
 
 
 const LoadingSpinner = () => (
@@ -37,7 +37,6 @@ export default function Teams() {
 
   useEffect(() => {
     getTeams().then((data) => {
-      console.log(data);
       setTeams(data);
       setLoading(false);
     });
@@ -65,64 +64,66 @@ export default function Teams() {
     <div className="p-6 min-h-screen text-text-base font-sans relative">
       <div className="flex justify-end items-center mb-6">
         <button 
-        onClick={() => setShowCreateModal(true)}
-        className="flex items-center gap-2 bg-accent-blue text-text-base px-3 py-1 rounded-md transition-colors hover:bg-opacity-80 text-sm">
+          onClick={() => setShowCreateModal(true)}
+          className="flex items-center gap-2 bg-accent-blue text-text-base px-3 py-1 rounded-md transition-colors hover:bg-opacity-80 text-sm"
+        >
           <PlusCircle size={16} />
           <span className="hidden md:inline">Create Team</span>
         </button>
-        
-{showCreateModal && (
-  <CreateTeamModal
-    onClose={() => setShowCreateModal(false)}
-    onTeamCreated={(newTeam) => setTeams((prev) => [...prev, newTeam])}
-  />
-)}
+
+        {showCreateModal && (
+          <CreateTeamModal
+            onClose={() => setShowCreateModal(false)}
+            onTeamCreated={(newTeam: TeamDto) => setTeams((prev) => [...prev, newTeam])}
+          />
+        )}
       </div>
+
       {teams.length === 0 ? (
         <p className="text-text-muted text-sm text-center">
           No teams available. Create one to get started!
         </p>
       ) : (
         <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {teams.map((team) => (
-            <li
-              key={team.id}
-              className="p-4 bg-background-light border border-background-dark rounded-xl shadow-lg transition-colors hover:border-accent-blue duration-300"
-            >
-              <h2 className="text-base md:text-lg font-semibold text-text-base mb-1">
-                {team.name}
-              </h2>
-              <p className="text-xs md:text-sm text-text-muted mb-2">
-                {team.description}
-              </p>
-              <p className="text-xs text-accent-blue mb-2">
-                Members: {team.members.length}
-              </p>
-              <ul className="flex flex-wrap gap-2 text-xs text-text-muted">
-                {team.members.slice(0, 3).map((name, idx) => (
-                  <li
-                    key={idx}
-                    className="px-2 py-1 bg-background-dark rounded-md"
-                  >
-                    {name}
-                  </li>
-                ))}
-                {team.members.length > 3 && (
-                  <li className="px-2 py-1 text-accent-blue">+{team.members.length - 3} more</li>
-                )}
-              </ul>
-              <button
-                onClick={() => handleOpenInvite(team.id)}
-                className="mt-3 px-3 py-1 bg-accent-blue text-text-base rounded-md transition-colors hover:bg-opacity-80 text-xs font-semibold w-full"
+          {teams.map((team) => {
+            const membersArray = Array.from(team.members || []);
+            return (
+              <li
+                key={team.id}
+                className="p-4 bg-background-light border border-background-dark rounded-xl shadow-lg transition-colors hover:border-accent-blue duration-300"
               >
-                Invite Members
-              </button>
-            </li>
-          ))}
+                <h2 className="text-base md:text-lg font-semibold text-text-base mb-1">
+                  {team.name}
+                </h2>
+                <p className="text-xs md:text-sm text-text-muted mb-2">
+                  {team.description}
+                </p>
+                <p className="text-xs text-accent-blue mb-2">
+                  Members: {membersArray.length}
+                </p>
+                <ul className="flex flex-wrap gap-2 text-xs text-text-muted">
+                  {membersArray.slice(0, 3).map((name: string, idx: number) => (
+                    <li key={idx} className="px-2 py-1 bg-background-dark rounded-md">
+                      {name}
+                    </li>
+                  ))}
+                  {membersArray.length > 3 && (
+                    <li className="px-2 py-1 text-accent-blue">+{membersArray.length - 3} more</li>
+                  )}
+                </ul>
+                <button
+                  onClick={() => handleOpenInvite(team.id!)}
+                  className="mt-3 px-3 py-1 bg-accent-blue text-text-base rounded-md transition-colors hover:bg-opacity-80 text-xs font-semibold w-full"
+                >
+                  Invite Members
+                </button>
+              </li>
+            );
+          })}
         </ul>
       )}
 
-      {showInviteModal && selectedTeamId && (
+      {showInviteModal && selectedTeamId !== null && (
         <div className="fixed inset-0 flex items-center justify-center bg-background-darker/70 backdrop-blur-sm z-50">
           <InviteMember
             teamId={selectedTeamId.toString()}
@@ -131,7 +132,7 @@ export default function Teams() {
               setTeams((prev) =>
                 prev.map((t) =>
                   t.id === selectedTeamId
-                    ? { ...t, members: [...t.members, newMemberName] }
+                    ? { ...t, members: new Set([...(t.members || []), newMemberName]) }
                     : t
                 )
               );

@@ -11,7 +11,7 @@ export default function Register() {
   const setToken = useAuthStore((s) => s.setToken);
   const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
       const data = await register({ username, email, password });

@@ -13,20 +13,20 @@
  */
 
 import { mapValues } from '../runtime';
-import type { UserDto } from './UserDto';
+import type { UserDto } from './user-dto';
 import {
     UserDtoFromJSON,
     UserDtoFromJSONTyped,
     UserDtoToJSON,
     UserDtoToJSONTyped,
-} from './UserDto';
-import type { TeamDto } from './TeamDto';
+} from './user-dto';
+import type { TeamDto } from './team-dto';
 import {
     TeamDtoFromJSON,
     TeamDtoFromJSONTyped,
     TeamDtoToJSON,
     TeamDtoToJSONTyped,
-} from './TeamDto';
+} from './team-dto';
 
 /**
  * 

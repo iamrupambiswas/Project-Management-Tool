@@ -14,22 +14,22 @@ export default function Sidebar() {
       </div>
       <nav className="flex-1 p-3 space-y-1 md:p-4 md:space-y-2">
         <NavItem
-          icon={<Home size={16} md:size={18} />}
+          icon={<Home className="w-4 h-4 md:w-5 md:h-5" />}
           label="Dashboard"
           onClick={() => navigate("/")}
         />
         <NavItem
-          icon={<Users size={16} md:size={18} />}
+          icon={<Users className="w-4 h-4 md:w-5 md:h-5" />}
           label="Teams"
           onClick={() => navigate("/teams")}
         />
         <NavItem
-          icon={<FolderKanban size={16} md:size={18} />}
+          icon={<FolderKanban className="w-4 h-4 md:w-5 md:h-5" />}
           label="Projects"
           onClick={() => navigate("/projects")}
         />
         <NavItem
-          icon={<CheckSquare size={16} md:size={18} />}
+          icon={<CheckSquare className="w-4 h-4 md:w-5 md:h-5" />}
           label="Tasks"
           onClick={() => navigate("/tasks")}
         />
@@ -47,7 +47,7 @@ export default function Sidebar() {
           }}
           className="flex items-center justify-center w-full gap-2 p-2 md:p-3 text-xs md:text-sm font-semibold text-white transition-colors duration-200 bg-error-red rounded-lg hover:bg-red-700"
         >
-          <LogOut size={16} md:size={18} />
+          <LogOut className="w-4 h-4 md:w-5 md:h-5" />
           Logout
         </button>
       </div>

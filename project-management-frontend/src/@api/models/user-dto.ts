@@ -13,13 +13,13 @@
  */
 
 import { mapValues } from '../runtime';
-import type { Role } from './Role';
+import type { Role } from './role';
 import {
     RoleFromJSON,
     RoleFromJSONTyped,
     RoleToJSON,
     RoleToJSONTyped,
-} from './Role';
+} from './role';
 
 /**
  * 

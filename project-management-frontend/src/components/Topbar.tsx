@@ -21,7 +21,7 @@ export default function Topbar() {
       </h1>
       <div className="flex items-center gap-4 md:gap-6">
         <div className="relative">
-          <Bell size={18} md:size={20} className="text-text-muted cursor-pointer hover:text-accent-blue transition-colors duration-200" />
+        <Bell className="w-5 h-5 md:w-6 md:h-6 text-text-muted cursor-pointer hover:text-accent-blue transition-colors duration-200" />
           <span className="absolute -top-1 right-0 block h-2 w-2 rounded-full ring-2 ring-background-light bg-error-red"></span>
         </div>
         <Link to="/profile" className="focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-blue rounded-full">
