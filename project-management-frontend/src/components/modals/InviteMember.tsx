@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { toast } from "react-hot-toast";
-import { addTeamMember } from "../services/teamService";
-import { getAllUsers } from "../services/userService";
+import { addTeamMember } from "../../services/teamService";
+import { getAllUsers } from "../../services/userService";
 import { motion } from "framer-motion";
 import { X, Search } from "lucide-react";
 

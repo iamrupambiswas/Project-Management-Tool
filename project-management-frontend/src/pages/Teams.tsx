@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { getTeams } from "../services/teamService";
-import InviteMember from "../components/InviteMember";
+import InviteMember from "../components/Modals/InviteMember";
 import { PlusCircle, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
-import CreateTeamModal from "../components/CreateTeamModal";
+import CreateTeamModal from "../components/Modals/CreateTeamModal";
 import type { TeamDto } from "../api/models/TeamDto";
 
 

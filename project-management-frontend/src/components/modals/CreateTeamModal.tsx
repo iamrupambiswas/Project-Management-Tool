@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
-import { createTeam } from "../services/teamService";
-import { getAllUsers } from "../services/userService";
+import { createTeam } from "../../services/teamService";
+import { getAllUsers } from "../../services/userService";
 import { X, Search } from "lucide-react";
 
 interface User {
