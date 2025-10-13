@@ -1,0 +1,59 @@
+services:
+  # --------------------
+  # Postgres DB
+  # --------------------
+  postgres:
+    image: postgres:latest
+    container_name: pm_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: project_management_db
+    ports:
+      - "5434:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - pm-network
+
+  # --------------------
+  # Backend (Spring Boot)
+  # --------------------
+  backend:
+    build:
+      context: ./project-management-backend
+      dockerfile: Dockerfile
+    container_name: pm_backend
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    depends_on:
+      - postgres
+    networks:
+      - pm-network
+
+  # --------------------
+  # Frontend (React)
+  # --------------------
+  frontend:
+    build:
+      context: ./project-management-frontend
+      dockerfile: Dockerfile
+    container_name: pm_frontend
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+    networks:
+      - pm-network
+
+# --------------------
+# Volumes & Networks
+# --------------------
+volumes:
+  pgdata:
+
+networks:
+  pm-network:
+    driver: bridge

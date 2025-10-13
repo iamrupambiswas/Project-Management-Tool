@@ -1,1 +1,17 @@
-FROM node:latest
+# Stage: Node environment for development
+FROM node:23-alpine
+
+WORKDIR /usr/src/app
+
+# Copy package files and install dependencies
+COPY package*.json ./
+RUN npm install
+
+# Copy all project files
+COPY . .
+
+# Expose Vite dev server port
+EXPOSE 5173
+
+# Start Vite in dev mode and bind to all network interfaces
+CMD ["npm", "run", "dev", "--", "--host"]
