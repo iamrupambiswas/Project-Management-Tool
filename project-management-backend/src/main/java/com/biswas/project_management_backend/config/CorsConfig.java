@@ -16,7 +16,8 @@ public class CorsConfig {
                 registry.addMapping("/**") // allow all endpoints
                         .allowedOrigins("http://localhost:5173") 
                         .allowedOrigins("https://project-management-tool-gules.vercel.app")
-                        .allowedOrigins("https://project-management-tool-rupam-biswas-projects.vercel.app/")
+                        .allowedOrigins("https://project-management-tool-rupam-biswas-projects.vercel.app")
+                        .allowedOrigins("https://project-management-tool-git-main-rupam-biswas-projects.vercel.app")
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("*")
                         .allowCredentials(true);
