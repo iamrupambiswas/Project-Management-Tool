@@ -2,18 +2,6 @@
 -- Fixes schema issues for production
 
 -- ----------------------
--- Drop existing tables if they exist (safe way)
--- ----------------------
-DROP TABLE IF EXISTS public.user_roles CASCADE;
-DROP TABLE IF EXISTS public.project_members CASCADE;
-DROP TABLE IF EXISTS public.team_members CASCADE;
-DROP TABLE IF EXISTS public.task CASCADE;
-DROP TABLE IF EXISTS public.project CASCADE;
-DROP TABLE IF EXISTS public.teams CASCADE;
-DROP TABLE IF EXISTS public.roles CASCADE;
-DROP TABLE IF EXISTS public.users CASCADE;
-
--- ----------------------
 -- Recreate tables cleanly
 -- ----------------------
 
