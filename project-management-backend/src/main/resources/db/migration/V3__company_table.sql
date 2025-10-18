@@ -1,0 +1,6 @@
+CREATE TABLE companies (
+    id BIGSERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    domain VARCHAR(255),
+    join_code VARCHAR(50) NOT NULL UNIQUE
+);
