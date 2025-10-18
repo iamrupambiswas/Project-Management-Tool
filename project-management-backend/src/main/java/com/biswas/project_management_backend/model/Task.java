@@ -64,4 +64,8 @@ public class Task {
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private User creator;
+
+    @ManyToOne
+    @JoinColumn(name = "company_id")
+    private Company company;
 }

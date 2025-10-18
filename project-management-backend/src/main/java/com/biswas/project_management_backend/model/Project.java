@@ -67,4 +67,8 @@ public class Project {
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private Set<Task> tasks = new HashSet<>();
+
+    @ManyToOne
+    @JoinColumn(name = "company_id")
+    private Company company;
 }
