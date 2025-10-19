@@ -12,6 +12,7 @@ import './index.css'
 import Members from './pages/Members';
 import Projects from './pages/Projects';
 import ProjectDetails from './pages/ProjectDetails';
+import { Analytics } from "@vercel/analytics/react";
 
 function App() {
   const isAuthenticated = useAuthStore((state) => state.token);
@@ -68,6 +69,9 @@ function App() {
               }
             />
           </Routes>
+
+          <Analytics />
+          
         </main>
       </div>
     </div>

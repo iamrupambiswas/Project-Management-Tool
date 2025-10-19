@@ -11,6 +11,7 @@
     "generate-open-apis": "openapi-generator-cli generate -i ./openapi/website-apis.json -g typescript-fetch -o ./src/@api --skip-validate-spec --additional-properties=apiModulePrefix=Api,fileNaming=kebab-case"
   },
   "dependencies": {
+    "@vercel/analytics": "^1.5.0",
     "axios": "^1.11.0",
     "framer-motion": "^12.23.16",
     "lottie-react": "^2.4.1",

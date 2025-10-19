@@ -14,6 +14,9 @@ export default function CreateProjectModal({ onClose, onProjectCreated }: Create
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const storedUser = localStorage.getItem("user");
+  const currentUser = storedUser ? JSON.parse(storedUser) : null;
+  const currentUserId = currentUser?.id ?? 0;
 
   const handleCreate = async () => {
     if (!name.trim()) {
@@ -35,7 +38,7 @@ export default function CreateProjectModal({ onClose, onProjectCreated }: Create
         taskCount: 0,
         team: undefined,
         members: [],
-        createdBy: undefined
+        createdById: currentUserId
       };
 
       const createdProject = await createProject(newProject);
