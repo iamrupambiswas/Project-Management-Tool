@@ -35,14 +35,12 @@ jobs:
           node-version: 20
 
       - name: Install Dependencies
-        run: |
-          cd project-management-frontend
-          npm install
+        run: npm install
+        working-directory: ./project-management-frontend
 
       - name: Build Frontend
-        run: |
-          cd project-management-frontend
-          npm run build
+        run: npm run build
+        working-directory: ./project-management-frontend
 
       - name: Deploy to Vercel
         uses: amondnet/vercel-action@v41.1.4
