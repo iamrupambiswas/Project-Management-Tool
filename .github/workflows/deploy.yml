@@ -1,0 +1,54 @@
+name: Deploy Project Management Tool
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  backend:
+    name: Deploy Backend (Render)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Trigger Render Deployment
+        run: |
+          echo "Deploying backend to Render..."
+          curl -X POST \
+            -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
+            -H "Accept: application/json" \
+            https://api.render.com/deploy/${{ secrets.RENDER_SERVICE_ID }}
+
+  frontend:
+    name: Deploy Frontend (Vercel)
+    runs-on: ubuntu-latest
+    needs: backend
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+
+      - name: Install Dependencies
+        run: |
+          cd project-management-frontend
+          npm install
+
+      - name: Build Frontend
+        run: |
+          cd project-management-frontend
+          npm run build
+
+      - name: Deploy to Vercel
+        uses: amondnet/vercel-action@v23
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          working-directory: ./project-management-frontend
+          prod: true
