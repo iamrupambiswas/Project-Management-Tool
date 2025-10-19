@@ -146,7 +146,7 @@ Additional backend capabilities:
 Thanks to these amazing people for their contributions 💪
 
 <a href="https://github.com/AbhishekPoojary">
-  <img src="avatars.githubusercontent.com/AbhishekPoojary" width="50" height="50" style="border-radius: 50%;" />
+  <img src="https://avatars.githubusercontent.com/AbhishekPoojary" width="50" height="50" style="border-radius: 50%;" />
 </a>
 
 - [@Abhishek S Poojary](https://github.com/AbhishekPoojary) – Improved README.md
