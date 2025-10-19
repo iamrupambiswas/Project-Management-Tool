@@ -72,10 +72,10 @@ export interface ProjectDto {
     status?: ProjectDtoStatusEnum;
     /**
      * 
-     * @type {UserDto}
+     * @type {number}
      * @memberof ProjectDto
      */
-    createdBy?: UserDto;
+    createdById?: number;
     /**
      * 
      * @type {TeamDto}
@@ -139,7 +139,7 @@ export function ProjectDtoFromJSONTyped(json: any, ignoreDiscriminator: boolean)
         'startDate': json['startDate'] == null ? undefined : (new Date(json['startDate'])),
         'endDate': json['endDate'] == null ? undefined : (new Date(json['endDate'])),
         'status': json['status'] == null ? undefined : json['status'],
-        'createdBy': json['createdBy'] == null ? undefined : UserDtoFromJSON(json['createdBy']),
+        'createdById': json['createdById'] == null ? undefined : json['createdById'],
         'team': json['team'] == null ? undefined : TeamDtoFromJSON(json['team']),
         'memberCount': json['memberCount'] == null ? undefined : json['memberCount'],
         'members': json['members'] == null ? undefined : ((json['members'] as Array<any>).map(UserDtoFromJSON)),
@@ -164,7 +164,7 @@ export function ProjectDtoToJSONTyped(value?: ProjectDto | null, ignoreDiscrimin
         'startDate': value['startDate'] == null ? value['startDate'] : value['startDate'].toISOString().substring(0,10),
         'endDate': value['endDate'] == null ? value['endDate'] : value['endDate'].toISOString().substring(0,10),
         'status': value['status'],
-        'createdBy': UserDtoToJSON(value['createdBy']),
+        'createdById': value['createdById'],
         'team': TeamDtoToJSON(value['team']),
         'memberCount': value['memberCount'],
         'members': value['members'] == null ? undefined : ((value['members'] as Array<any>).map(UserDtoToJSON)),

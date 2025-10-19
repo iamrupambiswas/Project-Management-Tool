@@ -7,11 +7,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class UserDtoMapper {
 
-    /**
-     * Converts a User Entity to a UserDto, mapping core identity and roles.
-     * @param user The User entity to convert.
-     * @return The resulting UserDto.
-     */
     public UserDto toDto(User user) {
         if (user == null) return null;
 
@@ -21,17 +16,10 @@ public class UserDtoMapper {
                 .username(user.getUsername())
                 .email(user.getEmail())
                 // Maps the Set<String> roles directly
-                .roles(user.getRoles())
+                .role(user.getRole())
                 .build();
     }
 
-    /**
-     * Converts a UserDto back to a User Entity.
-     * Note: This primarily maps identifying fields. The service layer is responsible
-     * for fetching and merging with an existing entity for updates or linking relationships.
-     * @param dto The UserDto to convert.
-     * @return The resulting User entity.
-     */
     public User toEntity(UserDto dto) {
         if (dto == null) return null;
 
@@ -45,7 +33,7 @@ public class UserDtoMapper {
         // Map mutable fields
         entity.setUsername(dto.getUsername());
         entity.setEmail(dto.getEmail());
-        entity.setRoles(dto.getRoles());
+        entity.setRole(dto.getRole());
 
         return entity;
     }

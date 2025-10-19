@@ -35,8 +35,8 @@ public class ProjectDtoMapper {
         dto.setStatus(project.getStatus());
 
         // 1. Map simple reference relationships using dedicated mappers
-        if (project.getCreatedBy() != null) {
-            dto.setCreatedBy(userDtoMapper.toDto(project.getCreatedBy()));
+        if (project.getCreatedById() != null) {
+            dto.setCreatedById(project.getCreatedById());
         }
 
         if (project.getTeam() != null) {
@@ -88,6 +88,7 @@ public class ProjectDtoMapper {
         project.setStartDate(dto.getStartDate());
         project.setEndDate(dto.getEndDate());
         project.setStatus(dto.getStatus());
+        project.setCreatedById(dto.getCreatedById());
 
         // Important: We do NOT map relational objects (createdBy, team, members) here.
         // In a real application, the service layer would receive the DTO, extract the IDs

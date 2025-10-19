@@ -19,18 +19,13 @@ public class ProjectDto {
     private LocalDate endDate;
     private ProjectStatus status;
 
-    // Uses the simplified DTO for the user who created the project
-    private UserDto createdBy;
+    private Long createdById;
 
-    // Uses the simplified DTO for the associated team
     private TeamDto team;
 
-    // Projects will include a count and a list of members for easy display
     private Integer memberCount;
 
-    // List of simplified DTOs for members (useful for showing a small subset in a table/list)
     private List<UserDto> members;
 
-    // We can also include the count of tasks related to this project
     private Long taskCount;
 }

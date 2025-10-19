@@ -2,14 +2,18 @@ package com.biswas.project_management_backend.service;
 
 import com.biswas.project_management_backend.dto.InviteRequest;
 import com.biswas.project_management_backend.dto.TeamDto;
-import com.biswas.project_management_backend.model.Role;
+import com.biswas.project_management_backend.dto.UserDto;
+import com.biswas.project_management_backend.dto.mapper.TeamDtoMapper;
+import com.biswas.project_management_backend.dto.mapper.UserDtoMapper;
 import com.biswas.project_management_backend.model.Team;
 import com.biswas.project_management_backend.model.User;
 import com.biswas.project_management_backend.repository.TeamRepository;
 import com.biswas.project_management_backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -20,6 +24,12 @@ public class TeamService {
 
     private final TeamRepository teamRepository;
     private final UserRepository userRepository;
+
+    @Autowired
+    TeamDtoMapper dtoMapper;
+
+    @Autowired
+    UserDtoMapper userDtoMapper;
 
     // ---------------- CREATE ----------------
     public TeamDto createTeam(TeamDto dto) {
@@ -39,10 +49,9 @@ public class TeamService {
                 .build();
 
         Team saved = teamRepository.save(team);
-        return mapToDto(saved);
+        return dtoMapper.toDto(saved);
     }
 
-    // ---------------- ADD MEMBER ----------------
     public TeamDto addMember(Long teamId, InviteRequest inviteRequest) {
         Team team = teamRepository.findById(teamId)
                 .orElseThrow(() -> new RuntimeException("Team not found"));
@@ -51,10 +60,9 @@ public class TeamService {
 
         team.getMembers().add(user);
         Team updated = teamRepository.save(team);
-        return mapToDto(updated);
+        return dtoMapper.toDto(updated);
     }
 
-    // ---------------- REMOVE MEMBER ----------------
     public TeamDto removeMember(Long teamId, Long userId) {
         Team team = teamRepository.findById(teamId)
                 .orElseThrow(() -> new RuntimeException("Team not found"));
@@ -63,37 +71,34 @@ public class TeamService {
 
         team.getMembers().remove(user);
         Team updated = teamRepository.save(team);
-        return mapToDto(updated);
+        return dtoMapper.toDto(updated);
     }
 
-    // ---------------- GET ALL ----------------
     public List<TeamDto> getAllTeams() {
-        return teamRepository.findAll()
-                .stream()
-                .map(this::mapToDto)
-                .collect(Collectors.toList());
+        List<Team> teams = teamRepository.findAll();
+        List<TeamDto> teamDtos = new ArrayList<>();
+
+        for(Team team: teams) {
+            teamDtos.add(dtoMapper.toDto(team));
+        }
+
+        return teamDtos;
     }
 
-    // ---------------- GET BY ID ----------------
     public TeamDto getTeam(Long id) {
-        return teamRepository.findById(id)
-                .map(this::mapToDto)
-                .orElseThrow(() -> new RuntimeException("Team not found"));
+        Team team = teamRepository.getById(id);
+        return dtoMapper.toDto(team);
     }
 
-    // ---------------- MAPPER ----------------
-    private TeamDto mapToDto(Team team) {
-        return TeamDto.builder()
-                .id(team.getId())
-                .name(team.getName())
-                .description(team.getDescription())
-                .members(
-                        team.getMembers() == null ?
-                                Set.of() :
-                                team.getMembers().stream()
-                                        .map(User::getUsername)
-                                        .collect(Collectors.toSet())
-                )
-                .build();
+    public List<UserDto> getMembersOfTeam(Long id) {
+        Team team = teamRepository.getById(id);
+
+        List<UserDto> membersDto = new ArrayList<>();
+        for (User user : team.getMembers()) {
+            membersDto.add(userDtoMapper.toDto(user));
+        }
+
+        return membersDto;
     }
+
 }

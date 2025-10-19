@@ -13,14 +13,6 @@
  */
 
 import { mapValues } from '../runtime';
-import type { Role } from './role';
-import {
-    RoleFromJSON,
-    RoleFromJSONTyped,
-    RoleToJSON,
-    RoleToJSONTyped,
-} from './role';
-
 /**
  * 
  * @export
@@ -47,11 +39,22 @@ export interface UserDto {
     email?: string;
     /**
      * 
-     * @type {Set<Role>}
+     * @type {string}
      * @memberof UserDto
      */
-    roles?: Set<Role>;
+    role?: UserDtoRoleEnum;
 }
+
+
+/**
+ * @export
+ */
+export const UserDtoRoleEnum = {
+    Admin: 'ADMIN',
+    User: 'USER'
+} as const;
+export type UserDtoRoleEnum = typeof UserDtoRoleEnum[keyof typeof UserDtoRoleEnum];
+
 
 /**
  * Check if a given object implements the UserDto interface.
@@ -73,7 +76,7 @@ export function UserDtoFromJSONTyped(json: any, ignoreDiscriminator: boolean): U
         'id': json['id'] == null ? undefined : json['id'],
         'username': json['username'] == null ? undefined : json['username'],
         'email': json['email'] == null ? undefined : json['email'],
-        'roles': json['roles'] == null ? undefined : (new Set((json['roles'] as Array<any>).map(RoleFromJSON))),
+        'role': json['role'] == null ? undefined : json['role'],
     };
 }
 
@@ -91,7 +94,7 @@ export function UserDtoToJSONTyped(value?: UserDto | null, ignoreDiscriminator: 
         'id': value['id'],
         'username': value['username'],
         'email': value['email'],
-        'roles': value['roles'] == null ? undefined : (Array.from(value['roles'] as Set<any>).map(RoleToJSON)),
+        'role': value['role'],
     };
 }
 

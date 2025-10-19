@@ -4,6 +4,7 @@ import com.biswas.project_management_backend.dto.ProjectDto;
 import com.biswas.project_management_backend.service.ProjectService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,7 +18,7 @@ public class ProjectController {
     @Autowired
     private final ProjectService projectService;
 
-    @PostMapping
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ProjectDto> createProject(@RequestBody ProjectDto projectDto) {
         ProjectDto createdProject = projectService.createProject(projectDto);
         return ResponseEntity.ok(createdProject);

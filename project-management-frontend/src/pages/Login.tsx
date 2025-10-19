@@ -8,6 +8,7 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const setToken = useAuthStore((s) => s.setToken);
+  const setUser = useAuthStore((s) => s.setUser);
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -15,6 +16,7 @@ export default function Login() {
     try {
       const data = await login({ username, password });
       setToken(data.token);
+      setUser(data.user);
       navigate("/dashboard");
     } catch (err) {
       setError("Invalid credentials");

@@ -22,7 +22,7 @@ public class AuthController {
     public ResponseEntity<AuthResponseDto> register(@RequestBody RegisterRequestDto request) {
         User savedUser = userService.registerUser(request);
         String token = jwtUtil.generateToken(savedUser.getUsername());
-        return ResponseEntity.ok(new AuthResponseDto(token));
+        return ResponseEntity.ok(new AuthResponseDto(token, savedUser));
     }
 
     @PostMapping("/login")

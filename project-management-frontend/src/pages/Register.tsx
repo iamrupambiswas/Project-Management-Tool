@@ -9,6 +9,7 @@ export default function Register() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const setToken = useAuthStore((s) => s.setToken);
+  const setUser = useAuthStore((s) => s.setUser);
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -16,6 +17,7 @@ export default function Register() {
     try {
       const data = await register({ username, email, password });
       setToken(data.token);
+      setUser(data.user);
       navigate("/dashboard");
     } catch (err) {
       setError("Registration failed. Try another email.");

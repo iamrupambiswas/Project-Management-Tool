@@ -35,14 +35,8 @@ public class Project {
     @Column(nullable = false)
     private ProjectStatus status = ProjectStatus.PLANNING;
 
-    // --- Relationships ---
-
-    // The user who created this project (Many Projects to One User)
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "created_by_id", nullable = false)
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
-    private User createdBy;
+    @Column(name = "created_by_id", nullable = false)
+    private Long createdById;
 
     // The team associated with this project (Many Projects to One Team)
     @ManyToOne(fetch = FetchType.LAZY)
@@ -68,7 +62,6 @@ public class Project {
     @EqualsAndHashCode.Exclude
     private Set<Task> tasks = new HashSet<>();
 
-    @ManyToOne
-    @JoinColumn(name = "company_id")
-    private Company company;
+    @Column(name = "company_id")
+    private Long companyId;
 }

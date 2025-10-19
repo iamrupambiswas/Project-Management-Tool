@@ -4,38 +4,26 @@ import { motion } from "framer-motion";
 import type { ProjectDto as Project } from "../@api/models";
 import { getAllProjects } from "../services/projectService";
 import CreateProjectModal from "../components/modals/CreateProjectModal";
-
-
-const LoadingSpinner = () => (
-  <motion.div
-    className="flex flex-col items-center justify-center text-text-muted text-sm"
-    initial={{ opacity: 0 }}
-    animate={{ opacity: 1 }}
-    transition={{ duration: 0.5 }}
-  >
-    <motion.div
-      animate={{ rotate: 360 }}
-      transition={{
-        duration: 1,
-        ease: "linear",
-        repeat: Infinity,
-      }}
-    >
-      <Loader2 size={24} className="text-accent-green" />
-    </motion.div>
-    <p className="mt-2">Fetching project list...</p>
-  </motion.div>
-);
+import LoadingSpinner from "../components/common/LoadingSpinner";
+import { useNavigate } from "react-router-dom";
 
 export default function Projects() {
   // State is now strictly typed to the imported DTO
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     getAllProjects().then((data) => {
-      setProjects(data);
+
+      const normalizedProjects = data.map((p: any) => ({
+        ...p,
+        startDate: p.startDate ? new Date(p.startDate) : null,
+        endDate: p.endDate ? new Date(p.endDate) : null,
+      }));
+  
+      setProjects(normalizedProjects);
       setLoading(false);
     });
   }, []);
@@ -59,22 +47,18 @@ export default function Projects() {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-[50vh] bg-background-dark">
-        <LoadingSpinner />
+      <div className="flex justify-center items-center min-h-[50vh]">
+        <LoadingSpinner message="Fetching project list..." />
       </div>
     );
   }
 
   return (
-    <div className="p-6 min-h-screen text-text-base font-sans bg-background-dark">
-      <div className="flex justify-between items-center mb-6 border-b border-background-light pb-4">
-        <h1 className="text-xl md:text-2xl font-bold text-text-base flex items-center gap-2">
-            <BarChart2 size={24} className="text-accent-green hidden sm:block"/>
-            Project Overview
-        </h1>
+    <div className="p-6 min-h-screen text-text-base font-sans">
+      <div className="flex justify-end items-center mb-6">
         <button 
           onClick={() => setShowCreateModal(true)}
-          className="flex items-center gap-2 bg-accent-green text-background-light px-4 py-2 rounded-xl transition-transform duration-200 hover:scale-[1.03] shadow-md hover:shadow-lg text-sm font-semibold"
+          className="flex items-center gap-2 bg-accent-blue text-text-base px-3 py-1 rounded-md transition-colors hover:bg-opacity-80 text-sm"
         >
           <PlusCircle size={18} />
           <span className="hidden md:inline">Start New Project</span>
@@ -133,6 +117,7 @@ export default function Projects() {
                 </div>
                 
                 <button
+                  onClick={() => navigate(`/projects/${project.id}`)}
                   className="px-3 py-1 bg-background-dark md:bg-transparent text-accent-green rounded-lg transition-colors hover:bg-accent-green/20 text-xs font-semibold flex-shrink-0 w-full md:w-auto"
                 >
                   View Details

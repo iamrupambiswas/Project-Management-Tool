@@ -1,6 +1,6 @@
 package com.biswas.project_management_backend.dto;
 
-import com.biswas.project_management_backend.model.Role;
+import com.biswas.project_management_backend.model.enm.Role;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,5 +16,5 @@ public class UserDto {
     private Long id;
     private String username;
     private String email;
-    private Set<Role> roles;
+    private Role role;
 }

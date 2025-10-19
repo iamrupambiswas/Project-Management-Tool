@@ -1,5 +1,6 @@
 package com.biswas.project_management_backend.model;
 
+import com.biswas.project_management_backend.model.enm.Role;
 import jakarta.persistence.*;
 import lombok.*;
 import java.util.Set;
@@ -26,13 +27,8 @@ public class User {
     @Column(nullable = false)
     private String password;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(
-            name = "user_roles",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id")
-    )
-    private Set<Role> roles;
+    @Enumerated(EnumType.STRING)
+    private Role role;
 
     @ManyToOne
     @JoinColumn(name = "company_id")

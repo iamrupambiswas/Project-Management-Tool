@@ -17,12 +17,15 @@ import * as runtime from '../runtime';
 import type {
   InviteRequest,
   TeamDto,
+  UserDto,
 } from '../models/index';
 import {
     InviteRequestFromJSON,
     InviteRequestToJSON,
     TeamDtoFromJSON,
     TeamDtoToJSON,
+    UserDtoFromJSON,
+    UserDtoToJSON,
 } from '../models/index';
 
 export interface AddMemberRequest {
@@ -32,6 +35,10 @@ export interface AddMemberRequest {
 
 export interface CreateTeamRequest {
     teamDto: TeamDto;
+}
+
+export interface GetMembersOfTeamRequest {
+    teamId: number;
 }
 
 export interface GetTeamRequest {
@@ -178,6 +185,49 @@ export class TeamControllerApi extends runtime.BaseAPI {
      */
     async getAllTeams(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<TeamDto>> {
         const response = await this.getAllTeamsRaw(initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async getMembersOfTeamRaw(requestParameters: GetMembersOfTeamRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<UserDto>>> {
+        if (requestParameters['teamId'] == null) {
+            throw new runtime.RequiredError(
+                'teamId',
+                'Required parameter "teamId" was null or undefined when calling getMembersOfTeam().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("bearerAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+
+        let urlPath = `/api/teams/{teamId}/members`;
+        urlPath = urlPath.replace(`{${"teamId"}}`, encodeURIComponent(String(requestParameters['teamId'])));
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(UserDtoFromJSON));
+    }
+
+    /**
+     */
+    async getMembersOfTeam(requestParameters: GetMembersOfTeamRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<UserDto>> {
+        const response = await this.getMembersOfTeamRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

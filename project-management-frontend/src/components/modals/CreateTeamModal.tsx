@@ -2,23 +2,18 @@ import { useState, useEffect, useRef } from "react";
 import { createTeam } from "../../services/teamService";
 import { getAllUsers } from "../../services/userService";
 import { X, Search } from "lucide-react";
-
-interface User {
-  id: string;
-  username: string;
-  email: string;
-}
+import { TeamDto, UserDto } from "../../@api";
 
 interface CreateTeamModalProps {
   onClose: () => void;
-  onTeamCreated: (newTeam: any) => void;
+  onTeamCreated: (newTeam: TeamDto) => void;
 }
 
 export default function CreateTeamModal({ onClose, onTeamCreated }: CreateTeamModalProps) {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
-  const [selectedMembers, setSelectedMembers] = useState<User[]>([]);
-  const [allUsers, setAllUsers] = useState<User[]>([]);
+  const [selectedMembers, setSelectedMembers] = useState<UserDto[]>([]);
+  const [allUsers, setAllUsers] = useState<UserDto[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(false);
   const [usersLoading, setUsersLoading] = useState(true);
@@ -28,7 +23,7 @@ export default function CreateTeamModal({ onClose, onTeamCreated }: CreateTeamMo
     const fetchUsers = async () => {
       setUsersLoading(true);
       try {
-        const users = await getAllUsers();
+        const users: UserDto[] = await getAllUsers();
         setAllUsers(users);
         console.log(users);
       } catch (err) {
@@ -56,7 +51,7 @@ export default function CreateTeamModal({ onClose, onTeamCreated }: CreateTeamMo
     if (!name) return alert("Team name is required!");
     setLoading(true);
     try {
-      const memberEmails = selectedMembers.map((m) => m.email);
+      const memberEmails = selectedMembers.map((m) => m.email!!);
       const newTeam = await createTeam({ name, description, members: memberEmails });
       onTeamCreated(newTeam);
       onClose();
@@ -74,7 +69,7 @@ export default function CreateTeamModal({ onClose, onTeamCreated }: CreateTeamMo
     return userName.includes(searchQuery.toLowerCase());
   });
 
-  const handleSelectMember = (user: User) => {
+  const handleSelectMember = (user: UserDto) => {
     setSelectedMembers((prevMembers) =>
       prevMembers.some((m) => m.email === user.email)
         ? prevMembers.filter((m) => m.email !== user.email)
