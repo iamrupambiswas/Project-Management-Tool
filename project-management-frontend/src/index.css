@@ -12,8 +12,13 @@
 html, body, #root {
   height: 100%;
   margin: 0;
+  background-color: #1b0404;
   padding: 0;
   box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 /* Custom Animation for Cyber Background */

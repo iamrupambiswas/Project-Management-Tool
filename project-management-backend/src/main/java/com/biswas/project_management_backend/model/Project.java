@@ -64,4 +64,10 @@ public class Project {
 
     @Column(name = "company_id")
     private Long companyId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "project_manager_id")
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private User projectManager;
 }

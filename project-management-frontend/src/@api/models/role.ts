@@ -31,6 +31,12 @@ export interface Role {
      * @memberof Role
      */
     name?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Role
+     */
+    description?: string;
 }
 
 /**
@@ -52,6 +58,7 @@ export function RoleFromJSONTyped(json: any, ignoreDiscriminator: boolean): Role
         
         'id': json['id'] == null ? undefined : json['id'],
         'name': json['name'] == null ? undefined : json['name'],
+        'description': json['description'] == null ? undefined : json['description'],
     };
 }
 
@@ -68,6 +75,7 @@ export function RoleToJSONTyped(value?: Role | null, ignoreDiscriminator: boolea
         
         'id': value['id'],
         'name': value['name'],
+        'description': value['description'],
     };
 }
 

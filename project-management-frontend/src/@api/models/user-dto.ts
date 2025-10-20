@@ -39,22 +39,11 @@ export interface UserDto {
     email?: string;
     /**
      * 
-     * @type {string}
+     * @type {Set<string>}
      * @memberof UserDto
      */
-    role?: UserDtoRoleEnum;
+    roles?: Set<string>;
 }
-
-
-/**
- * @export
- */
-export const UserDtoRoleEnum = {
-    Admin: 'ADMIN',
-    User: 'USER'
-} as const;
-export type UserDtoRoleEnum = typeof UserDtoRoleEnum[keyof typeof UserDtoRoleEnum];
-
 
 /**
  * Check if a given object implements the UserDto interface.
@@ -76,7 +65,7 @@ export function UserDtoFromJSONTyped(json: any, ignoreDiscriminator: boolean): U
         'id': json['id'] == null ? undefined : json['id'],
         'username': json['username'] == null ? undefined : json['username'],
         'email': json['email'] == null ? undefined : json['email'],
-        'role': json['role'] == null ? undefined : json['role'],
+        'roles': json['roles'] == null ? undefined : new Set(json['roles']),
     };
 }
 
@@ -94,7 +83,7 @@ export function UserDtoToJSONTyped(value?: UserDto | null, ignoreDiscriminator: 
         'id': value['id'],
         'username': value['username'],
         'email': value['email'],
-        'role': value['role'],
+        'roles': value['roles'] == null ? undefined : Array.from(value['roles'] as Set<any>),
     };
 }
 

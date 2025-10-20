@@ -23,6 +23,12 @@ public class Team {
 
     private String description;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "team_lead_id")
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private User teamLead;
+
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "team_members",

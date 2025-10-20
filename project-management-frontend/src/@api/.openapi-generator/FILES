@@ -12,6 +12,7 @@ models/index.ts
 models/invite-request.ts
 models/project-dto.ts
 models/register-request-dto.ts
+models/role.ts
 models/task-dto.ts
 models/team-dto.ts
 models/user-dto.ts

@@ -146,6 +146,7 @@ export default function ProjectDetails() {
                     initial={{ opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.2 }}
+                    onClick={() => task.id && navigate(`/tasks/${task.id}`)}
                     className="p-3 bg-background-dark rounded-lg flex flex-col sm:flex-row sm:justify-between sm:items-center text-sm border border-background-dark hover:border-accent-green/50 transition-colors cursor-pointer"
                 >
                     <span className="font-medium flex-grow truncate">{task.title}</span>
@@ -294,11 +295,6 @@ export default function ProjectDetails() {
           />
         </div>
       )}
-
-// 1. You would need to define this state/variable, perhaps fetching it from context:
-// const currentUserId = 1; // Placeholder: Replace with actual logged-in user's ID
-
-// ... inside the ProjectDetails render function
 
     {showTaskModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">

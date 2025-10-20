@@ -2,7 +2,11 @@ package com.biswas.project_management_backend.dto.mapper;
 
 import com.biswas.project_management_backend.dto.UserDto;
 import com.biswas.project_management_backend.model.User;
+import com.biswas.project_management_backend.model.Role;
 import org.springframework.stereotype.Component;
+
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Component
 public class UserDtoMapper {
@@ -15,8 +19,10 @@ public class UserDtoMapper {
                 .id(user.getId())
                 .username(user.getUsername())
                 .email(user.getEmail())
-                // Maps the Set<String> roles directly
-                .role(user.getRole())
+                .roles(user.getRoles()
+                        .stream()
+                        .map(Role::getName)
+                        .collect(Collectors.toSet()))
                 .build();
     }
 
@@ -25,15 +31,17 @@ public class UserDtoMapper {
 
         User entity = new User();
 
-        // Only map ID if present (used for identification in update scenarios)
         if (dto.getId() != null) {
             entity.setId(dto.getId());
         }
 
-        // Map mutable fields
         entity.setUsername(dto.getUsername());
         entity.setEmail(dto.getEmail());
-        entity.setRole(dto.getRole());
+
+        // NOTE: we can’t fully map roles here because Role entities
+        // should be fetched from DB (use RoleRepository in service layer)
+        // so we skip setting roles here
+        entity.setRoles(Set.of());
 
         return entity;
     }

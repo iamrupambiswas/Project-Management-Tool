@@ -13,6 +13,13 @@
  */
 
 import { mapValues } from '../runtime';
+import type { Role } from './role';
+import {
+    RoleFromJSON,
+    RoleFromJSONTyped,
+    RoleToJSON,
+    RoleToJSONTyped,
+} from './role';
 import type { Company } from './company';
 import {
     CompanyFromJSON,
@@ -53,10 +60,10 @@ export interface User {
     password?: string;
     /**
      * 
-     * @type {string}
+     * @type {Set<Role>}
      * @memberof User
      */
-    role?: UserRoleEnum;
+    roles?: Set<Role>;
     /**
      * 
      * @type {Company}
@@ -64,17 +71,6 @@ export interface User {
      */
     company?: Company;
 }
-
-
-/**
- * @export
- */
-export const UserRoleEnum = {
-    Admin: 'ADMIN',
-    User: 'USER'
-} as const;
-export type UserRoleEnum = typeof UserRoleEnum[keyof typeof UserRoleEnum];
-
 
 /**
  * Check if a given object implements the User interface.
@@ -97,7 +93,7 @@ export function UserFromJSONTyped(json: any, ignoreDiscriminator: boolean): User
         'username': json['username'] == null ? undefined : json['username'],
         'email': json['email'] == null ? undefined : json['email'],
         'password': json['password'] == null ? undefined : json['password'],
-        'role': json['role'] == null ? undefined : json['role'],
+        'roles': json['roles'] == null ? undefined : (new Set((json['roles'] as Array<any>).map(RoleFromJSON))),
         'company': json['company'] == null ? undefined : CompanyFromJSON(json['company']),
     };
 }
@@ -117,7 +113,7 @@ export function UserToJSONTyped(value?: User | null, ignoreDiscriminator: boolea
         'username': value['username'],
         'email': value['email'],
         'password': value['password'],
-        'role': value['role'],
+        'roles': value['roles'] == null ? undefined : (Array.from(value['roles'] as Set<any>).map(RoleToJSON)),
         'company': CompanyToJSON(value['company']),
     };
 }

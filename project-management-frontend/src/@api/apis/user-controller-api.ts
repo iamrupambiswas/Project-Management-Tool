@@ -22,6 +22,10 @@ import {
     UserDtoToJSON,
 } from '../models/index';
 
+export interface GetUserRequest {
+    id: number;
+}
+
 /**
  * 
  */
@@ -59,6 +63,49 @@ export class UserControllerApi extends runtime.BaseAPI {
      */
     async getAllUsers(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<UserDto>> {
         const response = await this.getAllUsersRaw(initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async getUserRaw(requestParameters: GetUserRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<UserDto>> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling getUser().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("bearerAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+
+        let urlPath = `/api/users/{id}`;
+        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => UserDtoFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async getUser(requestParameters: GetUserRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<UserDto> {
+        const response = await this.getUserRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
