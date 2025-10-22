@@ -47,6 +47,9 @@ services:
       - backend
     networks:
       - pm-network
+    volumes:
+      - ./project-management-frontend:/usr/src/app
+      - /usr/src/app/node_modules
 
 # --------------------
 # Volumes & Networks
