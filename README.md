@@ -145,11 +145,11 @@ Additional backend capabilities:
 
 Thanks to these amazing people for their contributions 💪
 
-<a href="https://github.com/AbhishekPoojary">
-  <img src="https://avatars.githubusercontent.com/AbhishekPoojary" width="50" height="50" style="border-radius: 50%;" />
-</a>
+| Contributor | Contribution |
+|-------------|---------------|
+| <a href="https://github.com/AbhishekPoojary"><img src="https://avatars.githubusercontent.com/AbhishekPoojary" width="60" height="60" style="border-radius:50%" /></a><br>[@Abhishek S Poojary](https://github.com/AbhishekPoojary) | Improved README.md |
+| <a href="https://github.com/chathumsp02"><img src="https://avatars.githubusercontent.com/chathumsp02" width="60" height="60" style="border-radius:50%" /></a><br>[@chathum_sp](https://github.com/chathumsp02) | Redesigned the Login and Register pages with a modern split-screen layout, animated visuals, and improved accessibility for a polished user experience. |
 
-- [@Abhishek S Poojary](https://github.com/AbhishekPoojary) – Improved README.md
 
 ## Contribution
 
