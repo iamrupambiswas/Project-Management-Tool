@@ -3,13 +3,17 @@ import { register } from "../services/authService";
 import { useAuthStore } from "../store/authStore";
 import { useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { User, Mail, Lock, ArrowRight, Sparkles } from "lucide-react";
+import { User, Mail, Lock, Code, ArrowRight, Sparkles } from "lucide-react";
+import { RegisterRequestDto } from "../@api/models";
 import registerImage from "../assets/registration-image.png";
 
 export default function Register() {
-  const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [formData, setFormData] = useState<RegisterRequestDto>({
+    username: "",
+    email: "",
+    password: "",
+    joinCode: "",
+  });
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const setToken = useAuthStore((s) => s.setToken);
@@ -20,15 +24,20 @@ export default function Register() {
     e.preventDefault();
     setIsLoading(true);
     try {
-      const data = await register({ username, email, password });
-      setToken(data.token);
-      setUser(data.user);
+      const data = await register(formData);
+      setToken(data.token ?? null);
+      setUser(data.user ?? null);
       navigate("/dashboard");
     } catch (err) {
-      setError("Registration failed. Try another email.");
+      setError("Registration failed. Try another email or join code.");
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   return (
@@ -61,7 +70,9 @@ export default function Register() {
         />
       </div>
 
-      <div className="flex flex-col lg:flex-row w-full h-full relative z-10">
+      <div className="flex flex-col lg:flex-row
+
+ w-full h-full relative z-10">
         {/* Left Side - Illustration */}
         <motion.div
           initial={{ opacity: 0, x: -50 }}
@@ -85,11 +96,10 @@ export default function Register() {
               alt="Register illustration"
               className="w-full drop-shadow-2xl"
             />
-            {/* Decorative glow */}
             <div className="absolute inset-0 bg-gradient-to-t from-accent-green/20 to-transparent blur-3xl -z-10" />
           </motion.div>
-        </motion.div> 
-        
+        </motion.div>
+
         {/* Right Side - Form */}
         <motion.div
           initial={{ opacity: 0, x: 50 }}
@@ -144,9 +154,10 @@ export default function Register() {
                   <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-text-muted group-focus-within:text-accent-green transition-colors" />
                   <input
                     type="text"
+                    name="username"
                     placeholder="Choose a username"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
+                    value={formData.username}
+                    onChange={handleInputChange}
                     className="w-full pl-12 pr-4 py-2.5 text-text-base bg-background-content/50 border border-background-light rounded-xl focus:border-accent-green focus:ring-2 focus:ring-accent-green/20 outline-none transition-all placeholder:text-text-muted/50"
                     required
                   />
@@ -162,9 +173,10 @@ export default function Register() {
                   <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-text-muted group-focus-within:text-accent-green transition-colors" />
                   <input
                     type="email"
+                    name="email"
                     placeholder="Enter your email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    value={formData.email}
+                    onChange={handleInputChange}
                     className="w-full pl-12 pr-4 py-2.5 text-text-base bg-background-content/50 border border-background-light rounded-xl focus:border-accent-green focus:ring-2 focus:ring-accent-green/20 outline-none transition-all placeholder:text-text-muted/50"
                     required
                   />
@@ -180,9 +192,29 @@ export default function Register() {
                   <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-text-muted group-focus-within:text-accent-green transition-colors" />
                   <input
                     type="password"
+                    name="password"
                     placeholder="Create a strong password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    value={formData.password}
+                    onChange={handleInputChange}
+                    className="w-full pl-12 pr-4 py-2.5 text-text-base bg-background-content/50 border border-background-light rounded-xl focus:border-accent-green focus:ring-2 focus:ring-accent-green/20 outline-none transition-all placeholder:text-text-muted/50"
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Join Code Input */}
+              <div>
+                <label className="block text-text-muted text-sm mb-1.5 font-['Inter']">
+                  Join Code
+                </label>
+                <div className="relative group">
+                  <Code className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-text-muted group-focus-within:text-accent-green transition-colors" />
+                  <input
+                    type="text"
+                    name="joinCode"
+                    placeholder="Enter join code"
+                    value={formData.joinCode}
+                    onChange={handleInputChange}
                     className="w-full pl-12 pr-4 py-2.5 text-text-base bg-background-content/50 border border-background-light rounded-xl focus:border-accent-green focus:ring-2 focus:ring-accent-green/20 outline-none transition-all placeholder:text-text-muted/50"
                     required
                   />
@@ -207,8 +239,8 @@ export default function Register() {
                 )}
               </motion.button>
 
-              {/* Login Link */}
-              <div className="text-center pt-1.5">
+              {/* Links Section */}
+              <div className="text-center pt-1.5 space-y-2">
                 <p className="text-text-muted text-sm">
                   Already have an account?{" "}
                   <Link
@@ -216,6 +248,15 @@ export default function Register() {
                     className="text-accent-blue font-semibold hover:text-accent-purple transition-colors"
                   >
                     Sign in here
+                  </Link>
+                </p>
+                <p className="text-text-muted text-sm">
+                  Want to register a company?{" "}
+                  <Link
+                    to="/register-company"
+                    className="text-accent-blue font-semibold hover:text-accent-purple transition-colors"
+                  >
+                    Register company here
                   </Link>
                 </p>
               </div>

@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 
 import java.security.Key;
 import java.util.Date;
+import java.util.Map;
 import java.util.function.Function;
 
 @Component
@@ -35,8 +36,9 @@ public class JwtUtil {
                 .getBody();
     }
 
-    public String generateToken(String username) {
+    public String generateToken(String username, Map<String, Object> extraClaims) {
         return Jwts.builder()
+                .setClaims(extraClaims)
                 .setSubject(username)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10)) // 10h

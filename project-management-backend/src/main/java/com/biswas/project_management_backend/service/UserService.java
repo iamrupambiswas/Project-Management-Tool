@@ -1,12 +1,11 @@
 package com.biswas.project_management_backend.service;
 
-import com.biswas.project_management_backend.dto.AuthRequestDto;
-import com.biswas.project_management_backend.dto.AuthResponseDto;
-import com.biswas.project_management_backend.dto.RegisterRequestDto;
-import com.biswas.project_management_backend.dto.UserDto;
+import com.biswas.project_management_backend.dto.*;
 import com.biswas.project_management_backend.dto.mapper.UserDtoMapper;
+import com.biswas.project_management_backend.model.Company;
 import com.biswas.project_management_backend.model.Role;
 import com.biswas.project_management_backend.model.User;
+import com.biswas.project_management_backend.repository.CompanyRepository;
 import com.biswas.project_management_backend.repository.RoleRepository;
 import com.biswas.project_management_backend.repository.UserRepository;
 import com.biswas.project_management_backend.security.JwtUtil;
@@ -28,24 +27,80 @@ public class UserService {
     private final AuthenticationManager authenticationManager;
     private final UserDtoMapper userDtoMapper;
     private final RoleRepository roleRepository;
+    private final CompanyRepository companyRepository;
 
     // ---------------- AUTH ----------------
-    public User registerUser(RegisterRequestDto request) {
+    public AuthResponseDto registerCompanyWithAdmin(RegisterCompanyRequestDto request) {
 
+        // 1. Create company
+        Company company = Company.builder()
+                .name(request.getCompanyName())
+                .domain(request.getDomain())
+                .build();
+        Company savedCompany = companyRepository.save(company);
+
+        // 2. Assign admin role
+        Role adminRole = roleRepository.findByName("ADMIN")
+                .orElseThrow(() -> new RuntimeException("Default role ADMIN not found"));
+
+        // 3. Create admin user
+        User admin = User.builder()
+                .username(request.getAdmin().getName())
+                .email(request.getAdmin().getEmail())
+                .password(passwordEncoder.encode(request.getAdmin().getPassword()))
+                .roles(Collections.singleton(adminRole))
+                .company(savedCompany)
+                .build();
+        User savedAdmin = userRepository.save(admin);
+
+        // 4. Generate JWT with companyId in payload
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("companyId", savedCompany.getId());
+        String token = jwtUtil.generateToken(savedAdmin.getUsername(), claims);
+
+        UserDto userDto = userDtoMapper.toDto(savedAdmin);
+
+        return new AuthResponseDto(token, userDto);
+    }
+
+
+    public AuthResponseDto registerUserWithJoinCode(RegisterRequestDto request) {
+
+        // 1️⃣ Assign default USER role
         Role userRole = roleRepository.findByName("USER")
                 .orElseThrow(() -> new RuntimeException("Default role USER not found"));
 
+        // 2️⃣ If joinCode provided, fetch company
+        Company company = null;
+        if (request.getJoinCode() != null && !request.getJoinCode().isEmpty()) {
+            company = companyRepository.findByJoinCode(request.getJoinCode())
+                    .orElseThrow(() -> new RuntimeException("Invalid join code"));
+        }
+
+        // 3️⃣ Create user
         User user = User.builder()
                 .username(request.getUsername())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .roles(Collections.singleton(userRole))
+                .company(company)
                 .build();
 
-        return userRepository.save(user);
+        User savedUser = userRepository.save(user);
+
+        // 4️⃣ Generate JWT with companyId if available
+        Map<String, Object> claims = new HashMap<>();
+        if (company != null) claims.put("companyId", company.getId());
+        String token = jwtUtil.generateToken(savedUser.getUsername(), claims);
+
+        UserDto userDto = userDtoMapper.toDto(savedUser);
+
+        return new AuthResponseDto(token, userDto);
     }
 
-    public AuthResponseDto login(AuthRequestDto authRequest) {
+
+
+    public AuthResponseDto login(LoginRequestDto authRequest) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         authRequest.getUsername(),
@@ -56,8 +111,12 @@ public class UserService {
         User user = userRepository.findByUsername(authRequest.getUsername())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        String token = jwtUtil.generateToken(authRequest.getUsername());
-        return new AuthResponseDto(token, user);
+        Map<String, Object> claims = new HashMap<>();
+        if (user.getCompany() != null) claims.put("companyId", user.getCompany().getId());
+        String token = jwtUtil.generateToken(authRequest.getUsername(), claims);
+
+        UserDto userDto = userDtoMapper.toDto(user);
+        return new AuthResponseDto(token, userDto);
     }
 
     // ---------------- CRUD ----------------

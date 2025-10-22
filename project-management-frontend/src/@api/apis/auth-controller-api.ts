@@ -15,25 +15,32 @@
 
 import * as runtime from '../runtime';
 import type {
-  AuthRequestDto,
   AuthResponseDto,
+  LoginRequestDto,
+  RegisterCompanyRequestDto,
   RegisterRequestDto,
 } from '../models/index';
 import {
-    AuthRequestDtoFromJSON,
-    AuthRequestDtoToJSON,
     AuthResponseDtoFromJSON,
     AuthResponseDtoToJSON,
+    LoginRequestDtoFromJSON,
+    LoginRequestDtoToJSON,
+    RegisterCompanyRequestDtoFromJSON,
+    RegisterCompanyRequestDtoToJSON,
     RegisterRequestDtoFromJSON,
     RegisterRequestDtoToJSON,
 } from '../models/index';
 
 export interface LoginRequest {
-    authRequestDto: AuthRequestDto;
+    loginRequestDto: LoginRequestDto;
 }
 
 export interface RegisterRequest {
     registerRequestDto: RegisterRequestDto;
+}
+
+export interface Register1Request {
+    registerCompanyRequestDto: RegisterCompanyRequestDto;
 }
 
 /**
@@ -44,10 +51,10 @@ export class AuthControllerApi extends runtime.BaseAPI {
     /**
      */
     async loginRaw(requestParameters: LoginRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<AuthResponseDto>> {
-        if (requestParameters['authRequestDto'] == null) {
+        if (requestParameters['loginRequestDto'] == null) {
             throw new runtime.RequiredError(
-                'authRequestDto',
-                'Required parameter "authRequestDto" was null or undefined when calling login().'
+                'loginRequestDto',
+                'Required parameter "loginRequestDto" was null or undefined when calling login().'
             );
         }
 
@@ -73,7 +80,7 @@ export class AuthControllerApi extends runtime.BaseAPI {
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: AuthRequestDtoToJSON(requestParameters['authRequestDto']),
+            body: LoginRequestDtoToJSON(requestParameters['loginRequestDto']),
         }, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => AuthResponseDtoFromJSON(jsonValue));
@@ -128,6 +135,51 @@ export class AuthControllerApi extends runtime.BaseAPI {
      */
     async register(requestParameters: RegisterRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AuthResponseDto> {
         const response = await this.registerRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async register1Raw(requestParameters: Register1Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<AuthResponseDto>> {
+        if (requestParameters['registerCompanyRequestDto'] == null) {
+            throw new runtime.RequiredError(
+                'registerCompanyRequestDto',
+                'Required parameter "registerCompanyRequestDto" was null or undefined when calling register1().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("bearerAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+
+        let urlPath = `/api/auth/register/company`;
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: RegisterCompanyRequestDtoToJSON(requestParameters['registerCompanyRequestDto']),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => AuthResponseDtoFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async register1(requestParameters: Register1Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AuthResponseDto> {
+        const response = await this.register1Raw(requestParameters, initOverrides);
         return await response.value();
     }
 

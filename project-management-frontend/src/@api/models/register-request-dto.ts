@@ -37,6 +37,12 @@ export interface RegisterRequestDto {
      * @memberof RegisterRequestDto
      */
     password?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof RegisterRequestDto
+     */
+    joinCode?: string;
 }
 
 /**
@@ -59,6 +65,7 @@ export function RegisterRequestDtoFromJSONTyped(json: any, ignoreDiscriminator: 
         'username': json['username'] == null ? undefined : json['username'],
         'email': json['email'] == null ? undefined : json['email'],
         'password': json['password'] == null ? undefined : json['password'],
+        'joinCode': json['joinCode'] == null ? undefined : json['joinCode'],
     };
 }
 
@@ -76,6 +83,7 @@ export function RegisterRequestDtoToJSONTyped(value?: RegisterRequestDto | null,
         'username': value['username'],
         'email': value['email'],
         'password': value['password'],
+        'joinCode': value['joinCode'],
     };
 }
 

@@ -3,6 +3,7 @@ import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { useAuthStore } from "./store/authStore";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import RegisterCompany from './pages/RegisterCompany';
 import ProtectedRoute from "./components/ProtectedRoute";
 import Dashboard from "./pages/Dashboard";
 import Teams from "./pages/Teams";
@@ -34,6 +35,7 @@ function App() {
             <Route path="/" element={<Navigate to="/dashboard" />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/register-company" element={<RegisterCompany/>} />
             <Route
               path="/dashboard"
               element={

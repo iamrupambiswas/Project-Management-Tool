@@ -21,8 +21,8 @@ export default function Login() {
     setIsLoading(true);
     try {
       const data = await login({ username, password });
-      setToken(data.token);
-      setUser(data.user);
+      setToken(data.token ?? null);
+      setUser(data.user ?? null);
       navigate("/dashboard");
     } catch (err) {
       setError("Invalid credentials");
@@ -110,13 +110,13 @@ export default function Login() {
               {/* Username Input */}
               <div>
                 <label className="block text-text-muted text-sm mb-2 font-['Inter']">
-                  Username/Email Address
+                  Username
                 </label>
                 <div className="relative group">
                   <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-text-muted group-focus-within:text-accent-blue transition-colors" />
                   <input
                     type="text"
-                    placeholder="Enter your username or email"
+                    placeholder="Enter your username"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                     className="w-full pl-12 pr-4 py-3 text-text-base bg-background-content/50 border border-background-light rounded-xl focus:border-accent-blue focus:ring-2 focus:ring-accent-blue/20 outline-none transition-all placeholder:text-text-muted/50"
@@ -182,8 +182,8 @@ export default function Login() {
                 )}
               </motion.button>
 
-              {/* Register Link */}
-              <div className="text-center pt-2">
+              {/* Links Section */}
+              <div className="text-center pt-2 space-y-2">
                 <p className="text-text-muted text-sm">
                   Don't have an account?{" "}
                   <Link
@@ -191,6 +191,15 @@ export default function Login() {
                     className="text-accent-blue font-semibold hover:text-accent-purple transition-colors"
                   >
                     Create a ProjectFlow account
+                  </Link>
+                </p>
+                <p className="text-text-muted text-sm">
+                  Want to register a company?{" "}
+                  <Link
+                    to="/register-company"
+                    className="text-accent-blue font-semibold hover:text-accent-purple transition-colors"
+                  >
+                    Register company here
                   </Link>
                 </p>
               </div>
@@ -221,7 +230,6 @@ export default function Login() {
               alt="Login illustration"
               className="w-full drop-shadow-2xl"
             />
-            {/* Decorative glow */}
             <div className="absolute inset-0 bg-gradient-to-t from-accent-blue/20 to-transparent blur-3xl -z-10" />
           </motion.div>
         </motion.div>

@@ -393,6 +393,36 @@
         }
       }
     },
+    "/api/auth/register/company": {
+      "post": {
+        "tags": [
+          "auth-controller"
+        ],
+        "operationId": "register_1",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterCompanyRequestDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponseDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/auth/login": {
       "post": {
         "tags": [
@@ -403,7 +433,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/AuthRequestDto"
+                "$ref": "#/components/schemas/LoginRequestDto"
               }
             }
           },
@@ -815,6 +845,9 @@
           },
           "password": {
             "type": "string"
+          },
+          "joinCode": {
+            "type": "string"
           }
         }
       },
@@ -825,51 +858,14 @@
             "type": "string"
           },
           "user": {
-            "$ref": "#/components/schemas/User"
+            "$ref": "#/components/schemas/UserDto"
           }
         }
       },
-      "Company": {
+      "AdminDto": {
         "type": "object",
         "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int64"
-          },
           "name": {
-            "type": "string"
-          },
-          "domain": {
-            "type": "string"
-          },
-          "joinCode": {
-            "type": "string"
-          }
-        }
-      },
-      "Role": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "name": {
-            "type": "string"
-          },
-          "description": {
-            "type": "string"
-          }
-        }
-      },
-      "User": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "username": {
             "type": "string"
           },
           "email": {
@@ -877,20 +873,24 @@
           },
           "password": {
             "type": "string"
-          },
-          "roles": {
-            "uniqueItems": true,
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Role"
-            }
-          },
-          "company": {
-            "$ref": "#/components/schemas/Company"
           }
         }
       },
-      "AuthRequestDto": {
+      "RegisterCompanyRequestDto": {
+        "type": "object",
+        "properties": {
+          "companyName": {
+            "type": "string"
+          },
+          "domain": {
+            "type": "string"
+          },
+          "admin": {
+            "$ref": "#/components/schemas/AdminDto"
+          }
+        }
+      },
+      "LoginRequestDto": {
         "type": "object",
         "properties": {
           "username": {
