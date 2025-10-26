@@ -110,27 +110,6 @@
       }
     },
     "/api/projects": {
-      "get": {
-        "tags": [
-          "project-controller"
-        ],
-        "operationId": "getAllProjects",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ProjectDto"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
       "put": {
         "tags": [
           "project-controller"
@@ -189,27 +168,6 @@
       }
     },
     "/api/teams": {
-      "get": {
-        "tags": [
-          "team-controller"
-        ],
-        "operationId": "getAllTeams",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/TeamDto"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
       "post": {
         "tags": [
           "team-controller"
@@ -313,27 +271,6 @@
       }
     },
     "/api/tasks": {
-      "get": {
-        "tags": [
-          "task-controller"
-        ],
-        "operationId": "getAllTasks",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/TaskDto"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
       "post": {
         "tags": [
           "task-controller"
@@ -453,29 +390,6 @@
         }
       }
     },
-    "/api/users": {
-      "get": {
-        "tags": [
-          "user-controller"
-        ],
-        "operationId": "getAllUsers",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/UserDto"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/api/users/{id}": {
       "get": {
         "tags": [
@@ -500,6 +414,40 @@
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/UserDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/company/{companyId}": {
+      "get": {
+        "tags": [
+          "user-controller"
+        ],
+        "operationId": "getAllUsers",
+        "parameters": [
+          {
+            "name": "companyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UserDto"
+                  }
                 }
               }
             }
@@ -538,6 +486,40 @@
         }
       }
     },
+    "/api/teams/company/{companyId}": {
+      "get": {
+        "tags": [
+          "team-controller"
+        ],
+        "operationId": "getAllTeams",
+        "parameters": [
+          {
+            "name": "companyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TeamDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/tasks/project/{projectId}": {
       "get": {
         "tags": [
@@ -547,6 +529,40 @@
         "parameters": [
           {
             "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TaskDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/tasks/company/{companyId}": {
+      "get": {
+        "tags": [
+          "task-controller"
+        ],
+        "operationId": "getAllTasks",
+        "parameters": [
+          {
+            "name": "companyId",
             "in": "path",
             "required": true,
             "schema": {
@@ -621,6 +637,40 @@
         "responses": {
           "200": {
             "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/projects/company/{companyId}": {
+      "get": {
+        "tags": [
+          "project-controller"
+        ],
+        "operationId": "getAllProjects",
+        "parameters": [
+          {
+            "name": "companyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProjectDto"
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -776,6 +826,10 @@
           "taskCount": {
             "type": "integer",
             "format": "int64"
+          },
+          "companyId": {
+            "type": "integer",
+            "format": "int64"
           }
         }
       },
@@ -793,11 +847,14 @@
             "type": "string"
           },
           "members": {
-            "uniqueItems": true,
             "type": "array",
             "items": {
               "type": "string"
             }
+          },
+          "companyId": {
+            "type": "integer",
+            "format": "int64"
           }
         }
       },

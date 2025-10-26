@@ -6,26 +6,29 @@ import { getAllProjects } from "../services/projectService";
 import CreateProjectModal from "../components/modals/CreateProjectModal";
 import LoadingSpinner from "../components/common/LoadingSpinner";
 import { useNavigate } from "react-router-dom";
+import { useAuthStore } from "../store/authStore";
 
 export default function Projects() {
-  // State is now strictly typed to the imported DTO
+  const { companyId } = useAuthStore();
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
-    getAllProjects().then((data) => {
+    if (companyId !== null) {
+      getAllProjects(companyId).then((data) => {
 
-      const normalizedProjects = data.map((p: any) => ({
-        ...p,
-        startDate: p.startDate ? new Date(p.startDate) : null,
-        endDate: p.endDate ? new Date(p.endDate) : null,
-      }));
-  
-      setProjects(normalizedProjects);
-      setLoading(false);
-    });
+        const normalizedProjects = data.map((p: any) => ({
+          ...p,
+          startDate: p.startDate ? new Date(p.startDate) : null,
+          endDate: p.endDate ? new Date(p.endDate) : null,
+        }));
+    
+        setProjects(normalizedProjects);
+        setLoading(false);
+      });
+    }
   }, []);
 
   const getStatusClasses = (status: Project['status']) => {

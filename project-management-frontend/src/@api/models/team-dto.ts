@@ -39,10 +39,16 @@ export interface TeamDto {
     description?: string;
     /**
      * 
-     * @type {Set<string>}
+     * @type {Array<string>}
      * @memberof TeamDto
      */
-    members?: Set<string>;
+    members?: Array<string>;
+    /**
+     * 
+     * @type {number}
+     * @memberof TeamDto
+     */
+    companyId?: number;
 }
 
 /**
@@ -65,7 +71,8 @@ export function TeamDtoFromJSONTyped(json: any, ignoreDiscriminator: boolean): T
         'id': json['id'] == null ? undefined : json['id'],
         'name': json['name'] == null ? undefined : json['name'],
         'description': json['description'] == null ? undefined : json['description'],
-        'members': json['members'] == null ? undefined : new Set(json['members']),
+        'members': json['members'] == null ? undefined : json['members'],
+        'companyId': json['companyId'] == null ? undefined : json['companyId'],
     };
 }
 
@@ -83,7 +90,8 @@ export function TeamDtoToJSONTyped(value?: TeamDto | null, ignoreDiscriminator: 
         'id': value['id'],
         'name': value['name'],
         'description': value['description'],
-        'members': value['members'] == null ? undefined : Array.from(value['members'] as Set<any>),
+        'members': value['members'],
+        'companyId': value['companyId'],
     };
 }
 

@@ -4,9 +4,11 @@ import com.biswas.project_management_backend.dto.ProjectDto;
 import com.biswas.project_management_backend.dto.TaskDto;
 import com.biswas.project_management_backend.dto.mapper.ProjectDtoMapper;
 import com.biswas.project_management_backend.dto.mapper.TaskDtoMapper;
+import com.biswas.project_management_backend.model.Company;
 import com.biswas.project_management_backend.model.Project;
 import com.biswas.project_management_backend.model.Task;
 import com.biswas.project_management_backend.model.User;
+import com.biswas.project_management_backend.repository.CompanyRepository;
 import com.biswas.project_management_backend.repository.ProjectRepository;
 import com.biswas.project_management_backend.repository.TaskRepository;
 import com.biswas.project_management_backend.repository.UserRepository;
@@ -14,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -36,16 +39,21 @@ public class TaskService {
     @Autowired
     UserRepository userRepository;
 
+    @Autowired
+    CompanyRepository companyRepository;
+
     public TaskDto createTask(TaskDto dto) {
         Task task = dtoMapper.toEntity(dto);
         Project project = projectRepository.getById(dto.getProjectId());
-        ProjectDto projectDto = projectDtoMapper.toDto(project);
         User creator = userRepository.getById(dto.getCreatorId());
         User assignee = userRepository.getById(dto.getAssigneeId());
+        Company company = companyRepository.getById(dto.getCompanyId());
 
         task.setProject(project);
         task.setCreator(creator);
         task.setAssignee(assignee);
+        task.setCompany(company);
+
         Task saved = taskRepository.save(task);
         return dtoMapper.toDto(saved);
     }
@@ -74,8 +82,8 @@ public class TaskService {
         return dtoMapper.toDto(task);
     }
 
-    public List<TaskDto> getAllTasks() {
-        List<Task> tasks = taskRepository.findAll();
+    public List<TaskDto> getAllTasks(Long companyId) {
+        List<Task> tasks = taskRepository.findByCompanyId(companyId);
         List<TaskDto> dtos = new ArrayList<>();
         for (Task t : tasks) {
             dtos.add(dtoMapper.toDto(t));

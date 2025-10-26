@@ -1,8 +1,9 @@
+import { TeamDto } from "../@api";
 import api from "./api";
 
 // create team
 export const createTeam = async (
-  teamDto: { name: string, description: string, members: string[] }
+  teamDto: TeamDto
 ) => {
   try {
     const res = await api.post("/teams", teamDto);
@@ -14,8 +15,8 @@ export const createTeam = async (
 }
 
 // Fetch all teams
-export const getTeams = async () => {
-  const res = await api.get("/teams");
+export const getTeams = async (companyId: number) => {
+  const res = await api.get(`/teams/company/${companyId}`);
   return res.data;
 };
 

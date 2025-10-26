@@ -1,4 +1,3 @@
-# Stage: Node environment for development
 FROM node:23-alpine
 
 WORKDIR /usr/src/app
@@ -7,11 +6,11 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 RUN npm install
 
-# Copy all project files
+# Copy source code
 COPY . .
 
 # Expose Vite dev server port
 EXPOSE 5173
 
-# Start Vite in dev mode and bind to all network interfaces
+# Start Vite in dev mode and bind to all interfaces
 CMD ["npm", "run", "dev", "--", "--host"]

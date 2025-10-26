@@ -25,6 +25,7 @@ export default function Login() {
       setUser(data.user ?? null);
       navigate("/dashboard");
     } catch (err) {
+      console.log(err);
       setError("Invalid credentials");
     } finally {
       setIsLoading(false);

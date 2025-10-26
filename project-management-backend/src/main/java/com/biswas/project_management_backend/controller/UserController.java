@@ -18,9 +18,9 @@ public class UserController {
 
     private final UserService userService;
 
-    @GetMapping
-    public List<UserDto> getAllUsers(){
-        return userService.getAllUsers();
+    @GetMapping("/company/{companyId}")
+    public List<UserDto> getAllUsers(@PathVariable Long companyId){
+        return userService.getAllUsers(companyId);
     }
 
     @GetMapping("/{id}")

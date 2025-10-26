@@ -62,8 +62,12 @@ public class Project {
     @EqualsAndHashCode.Exclude
     private Set<Task> tasks = new HashSet<>();
 
-    @Column(name = "company_id")
-    private Long companyId;
+    // Many projects belong to one company
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "company_id", nullable = false)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private Company company;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "project_manager_id")

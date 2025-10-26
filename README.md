@@ -10,6 +10,29 @@ A full‑stack Project Management application with a React + TypeScript + Vite f
 - **API Docs**: Springdoc OpenAPI UI exposed by the backend.
 - **Dev Experience**: Hot reloading on the frontend, standard Maven build on the backend.
 
+### Architecture Diagram
+
+```mermaid
+graph TD
+    subgraph Frontend
+        F1[React + TypeScript + Vite] --> F2[HTTP Requests via Axios]
+        F2 -->|API Calls| B[Backend]
+    end
+
+    subgraph Backend
+        B1[Spring Boot 3 + JPA + Security] --> B2[Controllers: Auth, Users, Projects, Teams]
+        B2 --> B3[Services & Business Logic]
+        B3 --> B4[Repositories / JPA]
+        B4 --> DB[(PostgreSQL)]
+    end
+
+    B --> DB
+
+    style Frontend fill:#f0f9ff,stroke:#1e3a8a,stroke-width:2px
+    style Backend fill:#fef3c7,stroke:#b45309,stroke-width:2px
+    style DB fill:#dcfce7,stroke:#166534,stroke-width:2px
+```
+
 ## Repository Structure
 
 - **`project-management-frontend/`**: React + TypeScript + Vite app.

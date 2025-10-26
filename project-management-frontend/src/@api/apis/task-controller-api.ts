@@ -30,6 +30,10 @@ export interface DeleteTaskRequest {
     id: number;
 }
 
+export interface GetAllTasksRequest {
+    companyId: number;
+}
+
 export interface GetTaskByIdRequest {
     id: number;
 }
@@ -137,7 +141,14 @@ export class TaskControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async getAllTasksRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<TaskDto>>> {
+    async getAllTasksRaw(requestParameters: GetAllTasksRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<TaskDto>>> {
+        if (requestParameters['companyId'] == null) {
+            throw new runtime.RequiredError(
+                'companyId',
+                'Required parameter "companyId" was null or undefined when calling getAllTasks().'
+            );
+        }
+
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -151,7 +162,8 @@ export class TaskControllerApi extends runtime.BaseAPI {
             }
         }
 
-        let urlPath = `/api/tasks`;
+        let urlPath = `/api/tasks/company/{companyId}`;
+        urlPath = urlPath.replace(`{${"companyId"}}`, encodeURIComponent(String(requestParameters['companyId'])));
 
         const response = await this.request({
             path: urlPath,
@@ -165,8 +177,8 @@ export class TaskControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async getAllTasks(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<TaskDto>> {
-        const response = await this.getAllTasksRaw(initOverrides);
+    async getAllTasks(requestParameters: GetAllTasksRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<TaskDto>> {
+        const response = await this.getAllTasksRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

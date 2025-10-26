@@ -22,6 +22,10 @@ import {
     UserDtoToJSON,
 } from '../models/index';
 
+export interface GetAllUsersRequest {
+    companyId: number;
+}
+
 export interface GetUserRequest {
     id: number;
 }
@@ -33,7 +37,14 @@ export class UserControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async getAllUsersRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<UserDto>>> {
+    async getAllUsersRaw(requestParameters: GetAllUsersRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<UserDto>>> {
+        if (requestParameters['companyId'] == null) {
+            throw new runtime.RequiredError(
+                'companyId',
+                'Required parameter "companyId" was null or undefined when calling getAllUsers().'
+            );
+        }
+
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -47,7 +58,8 @@ export class UserControllerApi extends runtime.BaseAPI {
             }
         }
 
-        let urlPath = `/api/users`;
+        let urlPath = `/api/users/company/{companyId}`;
+        urlPath = urlPath.replace(`{${"companyId"}}`, encodeURIComponent(String(requestParameters['companyId'])));
 
         const response = await this.request({
             path: urlPath,
@@ -61,8 +73,8 @@ export class UserControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async getAllUsers(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<UserDto>> {
-        const response = await this.getAllUsersRaw(initOverrides);
+    async getAllUsers(requestParameters: GetAllUsersRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<UserDto>> {
+        const response = await this.getAllUsersRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

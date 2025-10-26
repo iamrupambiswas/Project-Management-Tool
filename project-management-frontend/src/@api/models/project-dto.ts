@@ -100,6 +100,12 @@ export interface ProjectDto {
      * @memberof ProjectDto
      */
     taskCount?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof ProjectDto
+     */
+    companyId?: number;
 }
 
 
@@ -144,6 +150,7 @@ export function ProjectDtoFromJSONTyped(json: any, ignoreDiscriminator: boolean)
         'memberCount': json['memberCount'] == null ? undefined : json['memberCount'],
         'members': json['members'] == null ? undefined : ((json['members'] as Array<any>).map(UserDtoFromJSON)),
         'taskCount': json['taskCount'] == null ? undefined : json['taskCount'],
+        'companyId': json['companyId'] == null ? undefined : json['companyId'],
     };
 }
 
@@ -169,6 +176,7 @@ export function ProjectDtoToJSONTyped(value?: ProjectDto | null, ignoreDiscrimin
         'memberCount': value['memberCount'],
         'members': value['members'] == null ? undefined : ((value['members'] as Array<any>).map(UserDtoToJSON)),
         'taskCount': value['taskCount'],
+        'companyId': value['companyId'],
     };
 }
 

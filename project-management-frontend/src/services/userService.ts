@@ -2,9 +2,9 @@ import { UserDto } from "../@api";
 import api from "./api";
 
 // Fetch all users
-export const getAllUsers = async () => {
+export const getAllUsers = async (companyId: number) => {
     try {
-    const response = await api.get("/users");
+    const response = await api.get(`/users/company/${companyId}`);
     return response.data;
     } catch (err) {
         console.error("Failed to fetch users:", err);

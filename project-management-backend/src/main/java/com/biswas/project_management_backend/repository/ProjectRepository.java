@@ -8,5 +8,6 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
 
     List<Project> findByTeamId(Long teamId);
     List<Project> findByMembersId(Long userId);
+    List<Project> findByCompanyId(Long companyId);
 
 }

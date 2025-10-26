@@ -3,6 +3,7 @@ import { createTeam } from "../../services/teamService";
 import { getAllUsers } from "../../services/userService";
 import { X, Search } from "lucide-react";
 import { TeamDto, UserDto } from "../../@api";
+import { useAuthStore } from "../../store/authStore";
 
 interface CreateTeamModalProps {
   onClose: () => void;
@@ -10,6 +11,7 @@ interface CreateTeamModalProps {
 }
 
 export default function CreateTeamModal({ onClose, onTeamCreated }: CreateTeamModalProps) {
+  const { companyId } = useAuthStore();
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [selectedMembers, setSelectedMembers] = useState<UserDto[]>([]);
@@ -23,9 +25,10 @@ export default function CreateTeamModal({ onClose, onTeamCreated }: CreateTeamMo
     const fetchUsers = async () => {
       setUsersLoading(true);
       try {
-        const users: UserDto[] = await getAllUsers();
-        setAllUsers(users);
-        console.log(users);
+        if (companyId !== null) {
+          const users: UserDto[] = await getAllUsers(companyId);
+          setAllUsers(users);
+        }
       } catch (err) {
         console.error("Failed to fetch users:", err);
       } finally {
@@ -50,9 +53,20 @@ export default function CreateTeamModal({ onClose, onTeamCreated }: CreateTeamMo
   const handleCreate = async () => {
     if (!name) return alert("Team name is required!");
     setLoading(true);
+
     try {
-      const memberEmails = selectedMembers.map((m) => m.email!!);
-      const newTeam = await createTeam({ name, description, members: memberEmails });
+      const memberEmails: string[] = selectedMembers
+      .map((m) => m.email)
+      .filter((email): email is string => !!email); 
+
+      const teamData: TeamDto = {
+        name: name,
+        description: description || undefined,
+        members: memberEmails,
+        companyId: companyId ?? undefined
+      };
+
+      const newTeam = await createTeam(teamData);
       onTeamCreated(newTeam);
       onClose();
     } catch (err) {

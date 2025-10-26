@@ -189,7 +189,7 @@ export default function ProjectDetails() {
       
       <ul className="space-y-3">
         {/* Iterate over actual project members if available, falling back to placeholders */}
-        {project.team?.members && project.team.members.size > 0 ? (
+        {project.team?.members && project.team.members.length > 0 ? (
             Array.from(project.team.members).map((member: any) => (
                 <li key={member.id} className="p-3 bg-background-dark rounded-lg flex justify-between items-center text-sm">
                     <span className="font-medium">{member.username ?? member.email}</span>

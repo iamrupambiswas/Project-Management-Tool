@@ -7,6 +7,7 @@ import { User, Search, Users, PlusCircle, Crown, Briefcase } from "lucide-react"
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
 import InviteMemberModal from "../components/modals/InviteMember";
+import { useAuthStore } from "../store/authStore";
 
 // --- DTO Interfaces (Remain the same from the previous step) ---
 interface RoleDto {
@@ -92,6 +93,7 @@ const formatRoleName = (roleName: string) => {
 // --- Component ---
 
 export default function Members() {
+  const { companyId } = useAuthStore();
   const [members, setMembers] = useState<MemberDto[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -105,8 +107,10 @@ export default function Members() {
     const fetchMembers = async () => {
       setLoading(true);
       try {
-        const usersData = await getAllUsers();
-        setMembers(usersData as MemberDto[]);
+        if (companyId !== null) {
+          const usersData = await getAllUsers(companyId);
+          setMembers(usersData as MemberDto[]);
+        }
       } catch (error) {
         console.error("Failed to fetch members:", error);
         toast.error("Failed to load member list.");

@@ -28,4 +28,6 @@ public class ProjectDto {
     private List<UserDto> members;
 
     private Long taskCount;
+
+    private Long companyId;
 }

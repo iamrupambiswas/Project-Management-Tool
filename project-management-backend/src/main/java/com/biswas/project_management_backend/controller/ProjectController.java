@@ -24,9 +24,9 @@ public class ProjectController {
         return ResponseEntity.ok(createdProject);
     }
 
-    @GetMapping
-    public ResponseEntity<List<ProjectDto>> getAllProjects() {
-        List<ProjectDto> projects = projectService.getAllProjects();
+    @GetMapping("/company/{companyId}")
+    public ResponseEntity<List<ProjectDto>> getAllProjects(@PathVariable Long companyId) {
+        List<ProjectDto> projects = projectService.getAllProjects(companyId);
         return ResponseEntity.ok(projects);
     }
 

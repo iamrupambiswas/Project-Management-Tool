@@ -30,6 +30,10 @@ export interface DeleteProjectRequest {
     id: number;
 }
 
+export interface GetAllProjectsRequest {
+    companyId: number;
+}
+
 export interface GetProjectByIdRequest {
     id: number;
 }
@@ -132,7 +136,14 @@ export class ProjectControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async getAllProjectsRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ProjectDto>>> {
+    async getAllProjectsRaw(requestParameters: GetAllProjectsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ProjectDto>>> {
+        if (requestParameters['companyId'] == null) {
+            throw new runtime.RequiredError(
+                'companyId',
+                'Required parameter "companyId" was null or undefined when calling getAllProjects().'
+            );
+        }
+
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -146,7 +157,8 @@ export class ProjectControllerApi extends runtime.BaseAPI {
             }
         }
 
-        let urlPath = `/api/projects`;
+        let urlPath = `/api/projects/company/{companyId}`;
+        urlPath = urlPath.replace(`{${"companyId"}}`, encodeURIComponent(String(requestParameters['companyId'])));
 
         const response = await this.request({
             path: urlPath,
@@ -160,8 +172,8 @@ export class ProjectControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async getAllProjects(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ProjectDto>> {
-        const response = await this.getAllProjectsRaw(initOverrides);
+    async getAllProjects(requestParameters: GetAllProjectsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ProjectDto>> {
+        const response = await this.getAllProjectsRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

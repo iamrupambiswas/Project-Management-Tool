@@ -1,33 +1,38 @@
 package com.biswas.project_management_backend.dto.mapper;
 
 import com.biswas.project_management_backend.dto.TeamDto;
+import com.biswas.project_management_backend.model.Company;
 import com.biswas.project_management_backend.model.Team;
 import com.biswas.project_management_backend.model.User;
+import com.biswas.project_management_backend.repository.CompanyRepository;
+import com.biswas.project_management_backend.repository.TeamRepository;
+import com.biswas.project_management_backend.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
 public class TeamDtoMapper {
 
-    /**
-     * Converts a Team Entity to a TeamDto.
-     * Maps the Set<User> members from the entity to a Set<String> (usernames) in the DTO.
-     * @param team The Team entity to convert.
-     * @return The resulting TeamDto.
-     */
+    @Autowired
+    CompanyRepository companyRepository;
+
+    @Autowired
+    UserRepository userRepository;
+
     public TeamDto toDto(Team team) {
         if (team == null) return null;
 
-        Set<String> memberUsernames = Collections.emptySet();
+        List<String> memberUsernames = Collections.emptyList();
 
-        // Convert the Set<User> members from the entity to a Set<String> of usernames for the DTO
         if (team.getMembers() != null) {
             memberUsernames = team.getMembers().stream()
-                    .map(User::getUsername) // Assuming the User entity has getUsername()
-                    .collect(Collectors.toSet());
+                    .map(User::getUsername)
+                    .toList();
         }
 
         // Using Lombok's @Builder for cleaner DTO creation
@@ -36,16 +41,10 @@ public class TeamDtoMapper {
                 .name(team.getName())
                 .description(team.getDescription())
                 .members(memberUsernames)
+                .companyId(team.getCompany().getId())
                 .build();
     }
 
-    /**
-     * Converts a TeamDto back to a Team Entity.
-     * Note: The 'members' Set<String> from the DTO is ignored here, as converting string usernames
-     * back to User entities requires database access and belongs in the service layer.
-     * @param dto The TeamDto to convert.
-     * @return The resulting Team entity.
-     */
     public Team toEntity(TeamDto dto) {
         if (dto == null) return null;
 
@@ -56,6 +55,18 @@ public class TeamDtoMapper {
         }
         entity.setName(dto.getName());
         entity.setDescription(dto.getDescription());
+
+        Company company = companyRepository.findById(dto.getCompanyId())
+                .orElseThrow(() -> new RuntimeException("Company not found with id: " + dto.getCompanyId()));
+        entity.setCompany(company);
+
+        if (dto.getMembers() != null && !dto.getMembers().isEmpty()) {
+            Set<User> members = dto.getMembers().stream()
+                    .map(email -> userRepository.findByEmail(email)
+                            .orElseThrow(() -> new RuntimeException("User not found: " + email)))
+                    .collect(Collectors.toSet());
+            entity.setMembers(members);
+        }
 
         return entity;
     }

@@ -5,6 +5,7 @@ import { PlusCircle, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
 import CreateTeamModal from "../components/modals/CreateTeamModal";
 import type { TeamDto } from "../@api/models";
+import { useAuthStore } from "../store/authStore";
 
 
 const LoadingSpinner = () => (
@@ -29,6 +30,7 @@ const LoadingSpinner = () => (
 );
 
 export default function Teams() {
+  const { companyId } = useAuthStore();
   const [teams, setTeams] = useState<TeamDto[]>([]);
   const [loading, setLoading] = useState(true);
   const [showInviteModal, setShowInviteModal] = useState(false);
@@ -36,11 +38,13 @@ export default function Teams() {
   const [showCreateModal, setShowCreateModal] = useState(false);
 
   useEffect(() => {
-    getTeams().then((data) => {
-      setTeams(data);
-      setLoading(false);
-    });
-  }, []);
+    if (companyId !== null) {
+      getTeams(companyId).then((data) => {
+        setTeams(data);
+        setLoading(false);
+      });
+    } 
+  }, [companyId]);
 
   const handleOpenInvite = (teamId: number) => {
     setSelectedTeamId(teamId);
@@ -132,7 +136,7 @@ export default function Teams() {
               setTeams((prev) =>
                 prev.map((t) =>
                   t.id === selectedTeamId
-                    ? { ...t, members: new Set([...(t.members || []), newMemberName]) }
+                    ? { ...t, members: [...(t.members || []), newMemberName] } // <-- change here
                     : t
                 )
               );

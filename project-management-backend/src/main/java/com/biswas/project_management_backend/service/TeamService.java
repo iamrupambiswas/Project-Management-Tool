@@ -37,16 +37,7 @@ public class TeamService {
             throw new RuntimeException("Team name already exists");
         }
 
-        Set<User> teamMembers = dto.getMembers().stream()
-                .map(email -> userRepository.findByEmail(email)
-                        .orElseThrow(() -> new RuntimeException("User not found: " + email)))
-                .collect(Collectors.toSet());
-
-        Team team = Team.builder()
-                .name(dto.getName())
-                .description(dto.getDescription())
-                .members(teamMembers)
-                .build();
+        Team team = dtoMapper.toEntity(dto);
 
         Team saved = teamRepository.save(team);
         return dtoMapper.toDto(saved);
@@ -74,8 +65,8 @@ public class TeamService {
         return dtoMapper.toDto(updated);
     }
 
-    public List<TeamDto> getAllTeams() {
-        List<Team> teams = teamRepository.findAll();
+    public List<TeamDto> getAllTeams(Long companyId) {
+        List<Team> teams = teamRepository.findByCompanyId(companyId);
         List<TeamDto> teamDtos = new ArrayList<>();
 
         for(Team team: teams) {

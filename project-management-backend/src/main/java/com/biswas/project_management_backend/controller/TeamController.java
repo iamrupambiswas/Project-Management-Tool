@@ -23,9 +23,9 @@ public class TeamController {
         return ResponseEntity.ok(teamService.createTeam(dto));
     }
 
-    @GetMapping
-    public ResponseEntity<List<TeamDto>> getAllTeams() {
-        return ResponseEntity.ok(teamService.getAllTeams());
+    @GetMapping("/company/{companyId}")
+    public ResponseEntity<List<TeamDto>> getAllTeams(@PathVariable Long companyId) {
+        return ResponseEntity.ok(teamService.getAllTeams(companyId));
     }
 
     @GetMapping("/{id}")

@@ -2,9 +2,9 @@ import { TaskDto } from "../@api";
 import api from "./api";
 
 // Fetch all tasks
-export const getAllTasks = async (): Promise<TaskDto[]> => {
+export const getAllTasks = async (companyId: number): Promise<TaskDto[]> => {
   try {
-    const res = await api.get("/tasks");
+    const res = await api.get(`/tasks/company/${companyId}`);
     return res.data;
   } catch (err) {
     console.error("Error fetching tasks:", err);

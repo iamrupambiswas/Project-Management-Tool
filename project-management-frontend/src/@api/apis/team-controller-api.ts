@@ -37,6 +37,10 @@ export interface CreateTeamRequest {
     teamDto: TeamDto;
 }
 
+export interface GetAllTeamsRequest {
+    companyId: number;
+}
+
 export interface GetMembersOfTeamRequest {
     teamId: number;
 }
@@ -155,7 +159,14 @@ export class TeamControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async getAllTeamsRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<TeamDto>>> {
+    async getAllTeamsRaw(requestParameters: GetAllTeamsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<TeamDto>>> {
+        if (requestParameters['companyId'] == null) {
+            throw new runtime.RequiredError(
+                'companyId',
+                'Required parameter "companyId" was null or undefined when calling getAllTeams().'
+            );
+        }
+
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -169,7 +180,8 @@ export class TeamControllerApi extends runtime.BaseAPI {
             }
         }
 
-        let urlPath = `/api/teams`;
+        let urlPath = `/api/teams/company/{companyId}`;
+        urlPath = urlPath.replace(`{${"companyId"}}`, encodeURIComponent(String(requestParameters['companyId'])));
 
         const response = await this.request({
             path: urlPath,
@@ -183,8 +195,8 @@ export class TeamControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async getAllTeams(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<TeamDto>> {
-        const response = await this.getAllTeamsRaw(initOverrides);
+    async getAllTeams(requestParameters: GetAllTeamsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<TeamDto>> {
+        const response = await this.getAllTeamsRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

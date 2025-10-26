@@ -14,6 +14,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.*;
 
@@ -143,8 +144,8 @@ public class UserService {
         return userDtoMapper.toDto(saved);
     }
 
-    public List<UserDto> getAllUsers() {
-        List<User> users = userRepository.findAll();
+    public List<UserDto> getAllUsers(Long companyId) {
+        List<User> users = userRepository.findByCompanyId(companyId);
         List<UserDto> userDtos = new ArrayList<>();
         for(User user: users){
             UserDto userDto = userDtoMapper.toDto(user);

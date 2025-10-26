@@ -2,9 +2,9 @@ import { ProjectDto } from "../@api";
 import api from "./api"
 
 // Fetch all projects
-export const getAllProjects = async (): Promise<ProjectDto[]> => {
+export const getAllProjects = async (companyId: number): Promise<ProjectDto[]> => {
     try {
-        const res = await api.get("/projects");
+        const res = await api.get(`/projects/company/${companyId}`);
         return res.data
     } catch(err) {
         console.error("Error fetching projects:", err);
@@ -17,7 +17,7 @@ export const createProject = async (
     projectDto: ProjectDto
 ): Promise<ProjectDto> => {
     try {
-        const res = await api.post("/projects");
+        const res = await api.post("/projects", projectDto);
         return res.data;
     } catch (err) {
         console.error("Error creating project:", err);

@@ -48,7 +48,7 @@ services:
     networks:
       - pm-network
     volumes:
-      - ./project-management-frontend:/usr/src/app
+      - ./project-management-frontend:/usr/src/app:cached
       - /usr/src/app/node_modules
 
 # --------------------

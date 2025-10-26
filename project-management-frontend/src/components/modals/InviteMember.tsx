@@ -4,6 +4,7 @@ import { addTeamMember } from "../../services/teamService";
 import { getAllUsers } from "../../services/userService";
 import { motion } from "framer-motion";
 import { X, Search } from "lucide-react";
+import { useAuthStore } from "../../store/authStore";
 
 interface User {
   id: string;
@@ -18,6 +19,7 @@ interface InviteMemberProps {
 }
 
 export default function InviteMember({ teamId, onClose, onMemberAdded }: InviteMemberProps) {
+  const { companyId } = useAuthStore();
   const [allUsers, setAllUsers] = useState<User[]>([]);
   const [selectedMembers, setSelectedMembers] = useState<User[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -30,8 +32,10 @@ export default function InviteMember({ teamId, onClose, onMemberAdded }: InviteM
     const fetchUsers = async () => {
       setUsersLoading(true);
       try {
-        const users = await getAllUsers();
-        setAllUsers(users);
+        if (companyId !== null) {
+          const users = await getAllUsers(companyId);
+          setAllUsers(users);
+        }
       } catch (err) {
         console.error("Failed to fetch users:", err);
       } finally {
