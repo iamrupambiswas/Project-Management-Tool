@@ -1,28 +1,37 @@
 package com.biswas.project_management_backend.dto.mapper;
 
 import com.biswas.project_management_backend.dto.ProjectDto;
+import com.biswas.project_management_backend.dto.UserDto;
+import com.biswas.project_management_backend.model.Company;
 import com.biswas.project_management_backend.model.Project;
+import com.biswas.project_management_backend.model.Team;
 import com.biswas.project_management_backend.model.User;
+import com.biswas.project_management_backend.repository.CompanyRepository;
+import com.biswas.project_management_backend.repository.TeamRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
 public class ProjectDtoMapper {
 
-    private final UserDtoMapper userDtoMapper;
-    private final TeamDtoMapper teamDtoMapper;
+    @Autowired
+    UserDtoMapper userDtoMapper;
 
-    // Inject required mappers
-    public ProjectDtoMapper(UserDtoMapper userDtoMapper, TeamDtoMapper teamDtoMapper) {
-        this.userDtoMapper = userDtoMapper;
-        this.teamDtoMapper = teamDtoMapper;
-    }
+    @Autowired
+    TeamDtoMapper teamDtoMapper;
 
-    /**
-     * Converts a Project entity to a ProjectDto.
-     * This method handles mapping relationships and calculating aggregate fields.
-     */
+    @Autowired
+    CompanyRepository companyRepository;
+
+    @Autowired
+    TeamRepository teamRepository;
+
     public ProjectDto toDto(Project project) {
         if (project == null) return null;
 
@@ -44,19 +53,26 @@ public class ProjectDtoMapper {
         }
 
         // 2. Map members collection and calculate count
-        if (project.getMembers() != null) {
-            // Calculate member count
-            dto.setMemberCount(project.getMembers().size());
+        if (project.getTeam() != null) {
+            dto.setTeam(teamDtoMapper.toDto(project.getTeam()));
 
-            // Map the first few members for display purposes (e.g., first 5)
-            dto.setMembers(project.getMembers().stream()
-                    .limit(5) // Limit the list size to keep the payload small
-                    .map(userDtoMapper::toDto)
-                    .collect(Collectors.toList()));
+            // Populate members and member count from team
+            Team team = project.getTeam();
+            if (team.getMembers() != null && !team.getMembers().isEmpty()) {
+                List<UserDto> memberDtos = new ArrayList<>();
+                for (User member : team.getMembers()) {
+                    memberDtos.add(userDtoMapper.toDto(member));
+                }
+                dto.setMembers(memberDtos);
+                dto.setMemberCount(memberDtos.size());
+            } else {
+                dto.setMembers(new ArrayList<>());
+                dto.setMemberCount(0);
+            }
         } else {
+            dto.setMembers(new ArrayList<>());
             dto.setMemberCount(0);
         }
-
         // 3. Calculate task count
         if (project.getTasks() != null) {
             dto.setTaskCount((long) project.getTasks().size());
@@ -67,20 +83,13 @@ public class ProjectDtoMapper {
         return dto;
     }
 
-    /**
-     * Converts a ProjectDto to a Project entity.
-     * NOTE: This is generally used for creating or updating an entity.
-     * When converting DTO back to Entity, setting relational fields (like createdBy, team, members)
-     * requires database lookups (e.g., finding the User entity by ID) which should typically be
-     * handled in the service layer, not the mapper.
-     */
     public Project toEntity(ProjectDto dto) {
         if (dto == null) return null;
 
         Project project = new Project();
 
         // Map basic fields
-        if(dto.getId() != null) {
+        if (dto.getId() != null) {
             project.setId(dto.getId());
         }
         project.setName(dto.getName());
@@ -90,12 +99,28 @@ public class ProjectDtoMapper {
         project.setStatus(dto.getStatus());
         project.setCreatedById(dto.getCreatedById());
 
-        // Important: We do NOT map relational objects (createdBy, team, members) here.
-        // In a real application, the service layer would receive the DTO, extract the IDs
-        // for these relationships (e.g., Team ID), fetch the corresponding entities from the
-        // database, and then set them on the 'project' entity before saving.
+        // Map team
+        Team team = teamDtoMapper.toEntity(dto.getTeam());
+        project.setTeam(team);
 
-        // Example: project.setCreatedBy(userService.findUserById(dto.getCreatedBy().getId()));
+        // Fetch members from team repository if team is not null
+        if (team != null && team.getId() != null) {
+            Team fullTeam = teamRepository.getById(team.getId()); // fetch complete team from DB
+
+            if (fullTeam.getMembers() != null && !fullTeam.getMembers().isEmpty()) {
+                Set<User> projectMembers = new HashSet<>();
+                for (User member : fullTeam.getMembers()) {
+                    projectMembers.add(member); // add User entities
+                }
+                project.setMembers(projectMembers);
+            } else {
+                project.setMembers(new HashSet<>());
+            }
+        }
+
+        // Map company
+        Company company = companyRepository.getById(dto.getCompanyId());
+        project.setCompany(company);
 
         return project;
     }

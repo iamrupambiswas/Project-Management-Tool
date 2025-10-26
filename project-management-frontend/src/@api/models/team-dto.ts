@@ -42,7 +42,7 @@ export interface TeamDto {
      * @type {Array<string>}
      * @memberof TeamDto
      */
-    members?: Array<string>;
+    memberEmails?: Array<string>;
     /**
      * 
      * @type {number}
@@ -71,7 +71,7 @@ export function TeamDtoFromJSONTyped(json: any, ignoreDiscriminator: boolean): T
         'id': json['id'] == null ? undefined : json['id'],
         'name': json['name'] == null ? undefined : json['name'],
         'description': json['description'] == null ? undefined : json['description'],
-        'members': json['members'] == null ? undefined : json['members'],
+        'memberEmails': json['memberEmails'] == null ? undefined : json['memberEmails'],
         'companyId': json['companyId'] == null ? undefined : json['companyId'],
     };
 }
@@ -90,7 +90,7 @@ export function TeamDtoToJSONTyped(value?: TeamDto | null, ignoreDiscriminator: 
         'id': value['id'],
         'name': value['name'],
         'description': value['description'],
-        'members': value['members'],
+        'memberEmails': value['memberEmails'],
         'companyId': value['companyId'],
     };
 }

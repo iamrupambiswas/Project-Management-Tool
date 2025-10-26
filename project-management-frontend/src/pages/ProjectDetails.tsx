@@ -189,8 +189,8 @@ export default function ProjectDetails() {
       
       <ul className="space-y-3">
         {/* Iterate over actual project members if available, falling back to placeholders */}
-        {project.team?.members && project.team.members.length > 0 ? (
-            Array.from(project.team.members).map((member: any) => (
+        {project.team?.memberEmails && project.team.memberEmails.length > 0 ? (
+            Array.from(project.team.memberEmails).map((member: any) => (
                 <li key={member.id} className="p-3 bg-background-dark rounded-lg flex justify-between items-center text-sm">
                     <span className="font-medium">{member.username ?? member.email}</span>
                     <span className="text-text-muted text-xs">{member.role?.replace('_', ' ') ?? 'Member'}</span>
@@ -302,8 +302,8 @@ export default function ProjectDetails() {
                 projectId={projectId}
                 creatorId={currentUserId} 
                 teamMembers={
-                    project.team?.members 
-                    ? Array.from(project.team.members) as any 
+                    project.team?.memberEmails 
+                    ? Array.from(project.team.memberEmails) as any 
                     : []
                 } 
                 onClose={() => setShowTaskModal(false)}

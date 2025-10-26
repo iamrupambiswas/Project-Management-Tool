@@ -62,7 +62,7 @@ export default function CreateTeamModal({ onClose, onTeamCreated }: CreateTeamMo
       const teamData: TeamDto = {
         name: name,
         description: description || undefined,
-        members: memberEmails,
+        memberEmails: memberEmails,
         companyId: companyId ?? undefined
       };
 

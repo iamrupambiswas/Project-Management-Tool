@@ -5,7 +5,6 @@ import com.biswas.project_management_backend.model.Company;
 import com.biswas.project_management_backend.model.Team;
 import com.biswas.project_management_backend.model.User;
 import com.biswas.project_management_backend.repository.CompanyRepository;
-import com.biswas.project_management_backend.repository.TeamRepository;
 import com.biswas.project_management_backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -27,11 +26,11 @@ public class TeamDtoMapper {
     public TeamDto toDto(Team team) {
         if (team == null) return null;
 
-        List<String> memberUsernames = Collections.emptyList();
+        List<String> memberEmails = Collections.emptyList();
 
         if (team.getMembers() != null) {
-            memberUsernames = team.getMembers().stream()
-                    .map(User::getUsername)
+            memberEmails = team.getMembers().stream()
+                    .map(User::getEmail)
                     .toList();
         }
 
@@ -40,7 +39,7 @@ public class TeamDtoMapper {
                 .id(team.getId())
                 .name(team.getName())
                 .description(team.getDescription())
-                .members(memberUsernames)
+                .memberEmails(memberEmails)
                 .companyId(team.getCompany().getId())
                 .build();
     }
@@ -60,8 +59,8 @@ public class TeamDtoMapper {
                 .orElseThrow(() -> new RuntimeException("Company not found with id: " + dto.getCompanyId()));
         entity.setCompany(company);
 
-        if (dto.getMembers() != null && !dto.getMembers().isEmpty()) {
-            Set<User> members = dto.getMembers().stream()
+        if (dto.getMemberEmails() != null && !dto.getMemberEmails().isEmpty()) {
+            Set<User> members = dto.getMemberEmails().stream()
                     .map(email -> userRepository.findByEmail(email)
                             .orElseThrow(() -> new RuntimeException("User not found: " + email)))
                     .collect(Collectors.toSet());

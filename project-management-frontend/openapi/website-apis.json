@@ -846,7 +846,7 @@
           "description": {
             "type": "string"
           },
-          "members": {
+          "memberEmails": {
             "type": "array",
             "items": {
               "type": "string"

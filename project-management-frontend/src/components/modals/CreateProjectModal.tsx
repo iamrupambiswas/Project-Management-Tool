@@ -1,9 +1,11 @@
-import React, { useState } from "react";
-import { motion } from "framer-motion";
+import React, { useState, useEffect } from "react";
 import { Loader2, PlusCircle } from "lucide-react";
-import type { ProjectDto as Project } from "../../@api/models";
+import { motion } from "framer-motion";
+import type { ProjectDto as Project, TeamDto } from "../../@api/models";
 import { createProject } from "../../services/projectService";
+import { getTeams } from "../../services/teamService";
 import { toast } from "react-hot-toast";
+import { useAuthStore } from "../../store/authStore";
 
 interface CreateProjectModalProps {
   onClose: () => void;
@@ -11,12 +13,30 @@ interface CreateProjectModalProps {
 }
 
 export default function CreateProjectModal({ onClose, onProjectCreated }: CreateProjectModalProps) {
+  const { companyId, user } = useAuthStore();
+  const currentUserId = user?.id ?? 0;
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
+  const [selectedTeamId, setSelectedTeamId] = useState<number | null>(null);
+  const [teams, setTeams] = useState<TeamDto[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const storedUser = localStorage.getItem("user");
-  const currentUser = storedUser ? JSON.parse(storedUser) : null;
-  const currentUserId = currentUser?.id ?? 0;
+  const [isLoadingTeams, setIsLoadingTeams] = useState(true);
+
+  useEffect(() => {
+    if (companyId !== null) {
+      setIsLoadingTeams(true);
+      getTeams(companyId)
+        .then((data) => {
+          setTeams(data);
+          setIsLoadingTeams(false);
+        })
+        .catch((err) => {
+          console.error("Failed to fetch teams:", err);
+          toast.error("Failed to load teams");
+          setIsLoadingTeams(false);
+        });
+    }
+  }, [companyId]);
 
   const handleCreate = async () => {
     if (!name.trim()) {
@@ -27,18 +47,20 @@ export default function CreateProjectModal({ onClose, onProjectCreated }: Create
     setIsSubmitting(true);
 
     try {
+      const selectedTeam = teams.find((team) => team.id === selectedTeamId) || undefined;
       const newProject: Project = {
-        id: Date.now(),
+        id: undefined, // Backend assigns ID
         name: name.trim(),
         description: description.trim() || undefined,
         status: "PLANNING",
         startDate: new Date(),
         endDate: undefined,
+        createdById: currentUserId,
+        team: selectedTeam,
         memberCount: 0,
-        taskCount: 0,
-        team: undefined,
         members: [],
-        createdById: currentUserId
+        taskCount: 0,
+        companyId: companyId ?? undefined,
       };
 
       const createdProject = await createProject(newProject);
@@ -96,6 +118,31 @@ export default function CreateProjectModal({ onClose, onProjectCreated }: Create
             />
           </div>
 
+          <div>
+            <label htmlFor="teamSelect" className="block text-sm font-medium text-text-muted mb-1">
+              Team
+            </label>
+            <select
+              id="teamSelect"
+              value={selectedTeamId ?? ""}
+              onChange={(e) => setSelectedTeamId(e.target.value ? Number(e.target.value) : null)}
+              className="w-full px-3 py-2 bg-background-dark border border-background-dark rounded-lg text-text-base focus:ring-accent-green focus:border-accent-green outline-none transition duration-150"
+              disabled={isSubmitting || isLoadingTeams}
+            >
+              <option value="">Select a team (optional)</option>
+              {teams.map((team) => (
+                <option key={team.id} value={team.id}>
+                  {team.name}
+                </option>
+              ))}
+            </select>
+            {isLoadingTeams && (
+              <p className="text-xs text-text-muted mt-1 flex items-center gap-1">
+                <Loader2 size={14} className="animate-spin" /> Loading teams...
+              </p>
+            )}
+          </div>
+
           <div className="flex justify-end gap-3 pt-2">
             <button
               type="button"
@@ -110,7 +157,7 @@ export default function CreateProjectModal({ onClose, onProjectCreated }: Create
               type="button"
               onClick={handleCreate}
               className="px-4 py-2 text-sm font-semibold bg-accent-green text-background-light rounded-lg transition duration-150 flex items-center justify-center disabled:opacity-50"
-              disabled={isSubmitting}
+              disabled={isSubmitting || isLoadingTeams}
             >
               {isSubmitting ? <Loader2 size={18} className="animate-spin mr-2" /> : <PlusCircle size={18} className="mr-2" />}
               Create Project
