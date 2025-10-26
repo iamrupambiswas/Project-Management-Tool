@@ -9,7 +9,10 @@ import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/authStore";
 
 export default function Projects() {
-  const { companyId } = useAuthStore();
+  const { companyId, user } = useAuthStore();
+  const roles = Array.isArray(user?.roles)
+  ? user.roles
+  : Array.from(user?.roles || []);
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -59,13 +62,15 @@ export default function Projects() {
   return (
     <div className="p-6 min-h-screen text-text-base font-sans">
       <div className="flex justify-end items-center mb-6">
-        <button 
-          onClick={() => setShowCreateModal(true)}
-          className="flex items-center gap-2 bg-accent-blue text-text-base px-3 py-1 rounded-md transition-colors hover:bg-opacity-80 text-sm"
-        >
-          <PlusCircle size={18} />
-          <span className="hidden md:inline">Start New Project</span>
-        </button>
+        {roles.some((r) => r === "ADMIN" || r === "PROJECT_MANAGER") && (
+          <button 
+            onClick={() => setShowCreateModal(true)}
+            className="flex items-center gap-2 bg-accent-blue text-text-base px-3 py-1 rounded-md transition-colors hover:bg-opacity-80 text-sm"
+          >
+            <PlusCircle size={18} />
+            <span className="hidden md:inline">Start New Project</span>
+          </button>
+        )}
       </div>
 
       {projects.length === 0 ? (

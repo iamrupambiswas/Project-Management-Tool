@@ -30,7 +30,10 @@ const LoadingSpinner = () => (
 );
 
 export default function Teams() {
-  const { companyId } = useAuthStore();
+  const { companyId, user } = useAuthStore();
+  const roles = Array.isArray(user?.roles)
+  ? user.roles
+  : Array.from(user?.roles || []);
   const [teams, setTeams] = useState<TeamDto[]>([]);
   const [loading, setLoading] = useState(true);
   const [showInviteModal, setShowInviteModal] = useState(false);
@@ -67,19 +70,23 @@ export default function Teams() {
   return (
     <div className="p-6 min-h-screen text-text-base font-sans relative">
       <div className="flex justify-end items-center mb-6">
-        <button 
-          onClick={() => setShowCreateModal(true)}
-          className="flex items-center gap-2 bg-accent-blue text-text-base px-3 py-1 rounded-md transition-colors hover:bg-opacity-80 text-sm"
-        >
-          <PlusCircle size={16} />
-          <span className="hidden md:inline">Create Team</span>
-        </button>
+        {roles.some((r) => r === "ADMIN" || r === "PROJECT_MANAGER") && (
+          <>
+            <button
+              onClick={() => setShowCreateModal(true)}
+              className="flex items-center gap-2 bg-accent-blue text-text-base px-3 py-1 rounded-md transition-colors hover:bg-opacity-80 text-sm"
+            >
+              <PlusCircle size={16} />
+              <span className="hidden md:inline">Create Team</span>
+            </button>
 
-        {showCreateModal && (
-          <CreateTeamModal
-            onClose={() => setShowCreateModal(false)}
-            onTeamCreated={(newTeam: TeamDto) => setTeams((prev) => [...prev, newTeam])}
-          />
+            {showCreateModal && (
+              <CreateTeamModal
+                onClose={() => setShowCreateModal(false)}
+                onTeamCreated={(newTeam: TeamDto) => setTeams((prev) => [...prev, newTeam])}
+              />
+            )}
+          </>
         )}
       </div>
 

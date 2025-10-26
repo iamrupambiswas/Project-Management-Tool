@@ -40,7 +40,10 @@ const CURRENT_USER_ID = 101;
 const DEFAULT_PROJECT_ID = 1;
 
 export default function Tasks() {
-  const { companyId } = useAuthStore();
+  const { companyId, user } = useAuthStore();
+  const roles = Array.isArray(user?.roles)
+  ? user.roles
+  : Array.from(user?.roles || []);
   const [tasks, setTasks] = useState<TaskDto[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -102,13 +105,14 @@ export default function Tasks() {
     >
       {/* Filtering and Search Controls */}
       <div className="bg-background-light p-4 rounded-xl shadow-inner mb-6 flex flex-wrap gap-4 items-center">
-        <button
-          onClick={() => setShowCreateTaskModal(true)}
-          className="flex items-center gap-1 bg-accent-blue text-white px-4 py-1.5 rounded-md transition-colors hover:bg-opacity-80 text-sm font-semibold"
-        >
-          <PlusCircle size={18} /> New Task
-        </button>
-
+        {roles.some((r) => r === "ADMIN" || r === "PROJECT_MANAGER" || r === "TEAM_LEAD") && (
+          <button
+            onClick={() => setShowCreateTaskModal(true)}
+            className="flex items-center gap-1 bg-accent-blue text-white px-4 py-1.5 rounded-md transition-colors hover:bg-opacity-80 text-sm font-semibold"
+          >
+            <PlusCircle size={18} /> New Task
+          </button>
+        )}
         <div className="relative flex-grow min-w-[200px] ml-auto">
           <Search size={18} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-text-muted" />
           <input
