@@ -37,6 +37,11 @@ export interface GetUserAnalyticsRequest {
     companyId: number;
 }
 
+export interface UpdateUserRolesRequest {
+    userId: number;
+    requestBody: Set<string>;
+}
+
 /**
  * 
  */
@@ -171,6 +176,59 @@ export class UserControllerApi extends runtime.BaseAPI {
      */
     async getUserAnalytics(requestParameters: GetUserAnalyticsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<UserAnalyticsDto> {
         const response = await this.getUserAnalyticsRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async updateUserRolesRaw(requestParameters: UpdateUserRolesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<UserDto>> {
+        if (requestParameters['userId'] == null) {
+            throw new runtime.RequiredError(
+                'userId',
+                'Required parameter "userId" was null or undefined when calling updateUserRoles().'
+            );
+        }
+
+        if (requestParameters['requestBody'] == null) {
+            throw new runtime.RequiredError(
+                'requestBody',
+                'Required parameter "requestBody" was null or undefined when calling updateUserRoles().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("bearerAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+
+        let urlPath = `/api/users/{userId}/roles`;
+        urlPath = urlPath.replace(`{${"userId"}}`, encodeURIComponent(String(requestParameters['userId'])));
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'PUT',
+            headers: headerParameters,
+            query: queryParameters,
+            body: requestParameters['requestBody'],
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => UserDtoFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async updateUserRoles(requestParameters: UpdateUserRolesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<UserDto> {
+        const response = await this.updateUserRolesRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

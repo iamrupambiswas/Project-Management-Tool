@@ -43,6 +43,18 @@ public class TeamService {
         return dtoMapper.toDto(saved);
     }
 
+    public TeamDto updateTeam(Long id, TeamDto dto) {
+        Team team = teamRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Team not found"));
+
+        team.setName(dto.getName());
+        team.setDescription(dto.getDescription());
+
+        Team updatedTeam = teamRepository.save(team);
+        return dtoMapper.toDto(updatedTeam);
+    }
+
+
     public TeamDto addMember(Long teamId, InviteRequest inviteRequest) {
         Team team = teamRepository.findById(teamId)
                 .orElseThrow(() -> new RuntimeException("Team not found"));

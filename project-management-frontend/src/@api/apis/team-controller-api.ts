@@ -54,6 +54,11 @@ export interface RemoveMemberRequest {
     userId: number;
 }
 
+export interface UpdateTeamRequest {
+    id: number;
+    teamDto: TeamDto;
+}
+
 /**
  * 
  */
@@ -334,6 +339,59 @@ export class TeamControllerApi extends runtime.BaseAPI {
      */
     async removeMember(requestParameters: RemoveMemberRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TeamDto> {
         const response = await this.removeMemberRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async updateTeamRaw(requestParameters: UpdateTeamRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TeamDto>> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling updateTeam().'
+            );
+        }
+
+        if (requestParameters['teamDto'] == null) {
+            throw new runtime.RequiredError(
+                'teamDto',
+                'Required parameter "teamDto" was null or undefined when calling updateTeam().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("bearerAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+
+        let urlPath = `/api/teams/{id}`;
+        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'PUT',
+            headers: headerParameters,
+            query: queryParameters,
+            body: TeamDtoToJSON(requestParameters['teamDto']),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => TeamDtoFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async updateTeam(requestParameters: UpdateTeamRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TeamDto> {
+        const response = await this.updateTeamRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -192,5 +193,22 @@ public class UserService {
     public void deleteUser(Long id) {
         userRepository.deleteById(id);
     }
+
+    public UserDto updateUserRoles(Long userId, Set<String> roleNames) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // Fetch roles from DB by name
+        Set<Role> newRoles = roleNames.stream()
+                .map(name -> roleRepository.findByName(name)
+                        .orElseThrow(() -> new RuntimeException("Role not found: " + name)))
+                .collect(Collectors.toSet());
+
+        user.setRoles(newRoles);
+
+        User updatedUser = userRepository.save(user);
+        return userDtoMapper.toDto(updatedUser);
+    }
+
 
 }

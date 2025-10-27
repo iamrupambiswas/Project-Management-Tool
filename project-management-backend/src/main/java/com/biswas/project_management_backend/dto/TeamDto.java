@@ -13,5 +13,6 @@ public class TeamDto {
     private String name;
     private String description;
     private List<String> memberEmails;
+    private List<UserDto> members;
     private Long companyId;
 }

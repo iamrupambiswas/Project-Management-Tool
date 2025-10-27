@@ -1,6 +1,7 @@
 package com.biswas.project_management_backend.dto.mapper;
 
 import com.biswas.project_management_backend.dto.TeamDto;
+import com.biswas.project_management_backend.dto.UserDto;
 import com.biswas.project_management_backend.model.Company;
 import com.biswas.project_management_backend.model.Team;
 import com.biswas.project_management_backend.model.User;
@@ -9,6 +10,7 @@ import com.biswas.project_management_backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -23,24 +25,41 @@ public class TeamDtoMapper {
     @Autowired
     UserRepository userRepository;
 
+    @Autowired
+    UserDtoMapper userDtoMapper;
+
     public TeamDto toDto(Team team) {
         if (team == null) return null;
 
-        List<String> memberEmails = Collections.emptyList();
+        // Handle null-safe member email mapping
+        List<String> memberEmails = team.getMembers() != null
+                ? team.getMembers().stream()
+                .map(User::getEmail)
+                .toList()
+                : Collections.emptyList();
+
+        // Create a mutable list for UserDto mapping
+        List<UserDto> members = new ArrayList<>();
 
         if (team.getMembers() != null) {
-            memberEmails = team.getMembers().stream()
-                    .map(User::getEmail)
-                    .toList();
+            for (User user : team.getMembers()) {
+                UserDto userDto = userDtoMapper.toDto(user);
+                members.add(userDto);
+            }
         }
 
-        // Using Lombok's @Builder for cleaner DTO creation
+        // Build the DTO using Lombok's builder
         return TeamDto.builder()
                 .id(team.getId())
                 .name(team.getName())
                 .description(team.getDescription())
                 .memberEmails(memberEmails)
-                .companyId(team.getCompany().getId())
+                .members(members)
+                .companyId(
+                        team.getCompany() != null
+                                ? team.getCompany().getId()
+                                : null
+                )
                 .build();
     }
 

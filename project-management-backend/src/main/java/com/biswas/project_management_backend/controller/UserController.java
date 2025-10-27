@@ -12,6 +12,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/users")
@@ -39,6 +40,16 @@ public class UserController {
         String username = auth.getName();
         UserAnalyticsDto analytics = analyticsService.getUserAnalytics(username, companyId);
         return ResponseEntity.ok(analytics);
+    }
+
+    @PutMapping("/{userId}/roles")
+    @PreAuthorize("hasAnyRole('ADMIN', 'PROJECT_MANAGER')")
+    public ResponseEntity<UserDto> updateUserRoles(
+            @PathVariable Long userId,
+            @RequestBody Set<String> roleNames
+    ) {
+        UserDto updatedUser = userService.updateUserRoles(userId, roleNames);
+        return ResponseEntity.ok(updatedUser);
     }
 
 }

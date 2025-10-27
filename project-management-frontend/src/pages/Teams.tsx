@@ -106,6 +106,7 @@ export default function Teams() {
             {myTeams.map((team) => (
               <li
                 key={team.id}
+                onClick={() => (window.location.href = `/teams/${team.id}`)}
                 className="p-4 bg-background-light border border-background-dark rounded-lg flex items-center gap-4 hover:border-accent-blue hover:shadow-md transition-all duration-300"
               >
                 <Users size={20} className="text-accent-blue flex-shrink-0" />
@@ -137,6 +138,7 @@ export default function Teams() {
               return (
                 <li
                   key={team.id}
+                  onClick={() => (window.location.href = `/teams/${team.id}`)}
                   className="p-4 bg-background-light border border-background-dark rounded-xl shadow-lg transition-colors hover:border-accent-blue duration-300"
                 >
                   <h2 className="text-base md:text-lg font-semibold text-text-base mb-1">
@@ -170,11 +172,22 @@ export default function Teams() {
           <InviteMember
             teamId={selectedTeamId.toString()}
             onClose={handleCloseInvite}
-            onMemberAdded={(newMemberName: string) => {
+            onMemberAdded={(newMemberEmail: string) => {
               setTeams((prev) =>
                 prev.map((t) =>
                   t.id === selectedTeamId
-                    ? { ...t, members: [...(t.memberEmails || []), newMemberName] }
+                    ? {
+                        ...t,
+                        members: [
+                          ...(t.members ?? []),
+                          {
+                            id: Date.now(),
+                            email: newMemberEmail,
+                            username: newMemberEmail.split("@")[0],
+                            roles: new Set(["USER"]), // ✅ matches backend type
+                          },
+                        ],
+                      }
                     : t
                 )
               );

@@ -23,6 +23,11 @@ public class TeamController {
         return ResponseEntity.ok(teamService.createTeam(dto));
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<TeamDto> updateTeam(@PathVariable Long id, @RequestBody TeamDto dto) {
+        return ResponseEntity.ok(teamService.updateTeam(id, dto));
+    }
+
     @GetMapping("/company/{companyId}")
     public ResponseEntity<List<TeamDto>> getAllTeams(@PathVariable Long companyId) {
         return ResponseEntity.ok(teamService.getAllTeams(companyId));

@@ -13,6 +13,14 @@
  */
 
 import { mapValues } from '../runtime';
+import type { UserDto } from './user-dto';
+import {
+    UserDtoFromJSON,
+    UserDtoFromJSONTyped,
+    UserDtoToJSON,
+    UserDtoToJSONTyped,
+} from './user-dto';
+
 /**
  * 
  * @export
@@ -45,6 +53,12 @@ export interface TeamDto {
     memberEmails?: Array<string>;
     /**
      * 
+     * @type {Array<UserDto>}
+     * @memberof TeamDto
+     */
+    members?: Array<UserDto>;
+    /**
+     * 
      * @type {number}
      * @memberof TeamDto
      */
@@ -72,6 +86,7 @@ export function TeamDtoFromJSONTyped(json: any, ignoreDiscriminator: boolean): T
         'name': json['name'] == null ? undefined : json['name'],
         'description': json['description'] == null ? undefined : json['description'],
         'memberEmails': json['memberEmails'] == null ? undefined : json['memberEmails'],
+        'members': json['members'] == null ? undefined : ((json['members'] as Array<any>).map(UserDtoFromJSON)),
         'companyId': json['companyId'] == null ? undefined : json['companyId'],
     };
 }
@@ -91,6 +106,7 @@ export function TeamDtoToJSONTyped(value?: TeamDto | null, ignoreDiscriminator: 
         'name': value['name'],
         'description': value['description'],
         'memberEmails': value['memberEmails'],
+        'members': value['members'] == null ? undefined : ((value['members'] as Array<any>).map(UserDtoToJSON)),
         'companyId': value['companyId'],
     };
 }
