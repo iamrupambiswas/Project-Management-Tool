@@ -15,9 +15,12 @@
 
 import * as runtime from '../runtime';
 import type {
+  UserAnalyticsDto,
   UserDto,
 } from '../models/index';
 import {
+    UserAnalyticsDtoFromJSON,
+    UserAnalyticsDtoToJSON,
     UserDtoFromJSON,
     UserDtoToJSON,
 } from '../models/index';
@@ -28,6 +31,10 @@ export interface GetAllUsersRequest {
 
 export interface GetUserRequest {
     id: number;
+}
+
+export interface GetUserAnalyticsRequest {
+    companyId: number;
 }
 
 /**
@@ -118,6 +125,52 @@ export class UserControllerApi extends runtime.BaseAPI {
      */
     async getUser(requestParameters: GetUserRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<UserDto> {
         const response = await this.getUserRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async getUserAnalyticsRaw(requestParameters: GetUserAnalyticsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<UserAnalyticsDto>> {
+        if (requestParameters['companyId'] == null) {
+            throw new runtime.RequiredError(
+                'companyId',
+                'Required parameter "companyId" was null or undefined when calling getUserAnalytics().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        if (requestParameters['companyId'] != null) {
+            queryParameters['companyId'] = requestParameters['companyId'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("bearerAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+
+        let urlPath = `/api/users/analytics`;
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => UserAnalyticsDtoFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async getUserAnalytics(requestParameters: GetUserAnalyticsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<UserAnalyticsDto> {
+        const response = await this.getUserAnalyticsRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

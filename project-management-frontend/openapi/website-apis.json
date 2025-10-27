@@ -455,6 +455,37 @@
         }
       }
     },
+    "/api/users/analytics": {
+      "get": {
+        "tags": [
+          "user-controller"
+        ],
+        "operationId": "getUserAnalytics",
+        "parameters": [
+          {
+            "name": "companyId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserAnalyticsDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/teams/{id}": {
       "get": {
         "tags": [
@@ -668,6 +699,53 @@
                   "items": {
                     "$ref": "#/components/schemas/ProjectDto"
                   }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/analytics/summary": {
+      "get": {
+        "tags": [
+          "admin-controller"
+        ],
+        "operationId": "getAnalyticsSummary",
+        "parameters": [
+          {
+            "name": "companyId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "dateFrom",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "dateTo",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminAnalyticsDto"
                 }
               }
             }
@@ -955,6 +1033,89 @@
           },
           "password": {
             "type": "string"
+          }
+        }
+      },
+      "UserAnalyticsDto": {
+        "type": "object",
+        "properties": {
+          "assignedTasks": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "completedTasks": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "overdueTasks": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "userTasksByStatus": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          "totalProjects": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "activeProjects": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "completedProjects": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "totalTeams": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "AdminAnalyticsDto": {
+        "type": "object",
+        "properties": {
+          "totalUsers": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "totalProjects": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "totalTeams": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "totalTasks": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "tasksByStatus": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          "projectsByStatus": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          "overdueTasks": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "activeUsersLastWeek": {
+            "type": "integer",
+            "format": "int64"
           }
         }
       }

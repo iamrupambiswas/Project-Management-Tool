@@ -10,7 +10,6 @@ import toast from "react-hot-toast";
 import CreateTaskModal from "../components/modals/CreateTaskModal";
 import { useAuthStore } from "../store/authStore";
 
-// --- Helper functions ---
 const getStatusClasses = (status?: TaskDtoStatusEnum) => {
   switch (status) {
     case TaskDtoStatusEnum.Done: return "bg-green-600/50 text-green-300";
@@ -30,7 +29,7 @@ const getPriorityColor = (priority?: TaskDtoPriorityEnum) => {
   }
 };
 
-// --- Mock data for modal (replace with real data in your app) ---
+// Mock data for modal (replace with real data in your app)
 const MOCK_TEAM_MEMBERS = [
   { id: 101, username: "Alice Smith" },
   { id: 102, username: "Bob Johnson" },
@@ -41,18 +40,15 @@ const DEFAULT_PROJECT_ID = 1;
 
 export default function Tasks() {
   const { companyId, user } = useAuthStore();
-  const roles = Array.isArray(user?.roles)
-  ? user.roles
-  : Array.from(user?.roles || []);
+  const roles = Array.isArray(user?.roles) ? user.roles : Array.from(user?.roles || []);
+  const userId = user?.id || 0;
   const [tasks, setTasks] = useState<TaskDto[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState<string>("ALL");
   const [showCreateTaskModal, setShowCreateTaskModal] = useState(false);
-  
   const navigate = useNavigate();
 
-  // --- Fetch tasks from API ---
   useEffect(() => {
     const fetchTasks = async () => {
       setLoading(true);
@@ -76,7 +72,6 @@ export default function Tasks() {
     fetchTasks();
   }, [companyId]);
 
-  // --- Update task list after creating a new task ---
   const handleTaskCreated = (newTask: TaskDto) => {
     const normalizedTask = {
       ...newTask,
@@ -87,8 +82,8 @@ export default function Tasks() {
     setShowCreateTaskModal(false);
   };
 
-  // --- Filter tasks ---
-  const filteredTasks = tasks.filter((task) => {
+  const myTasks = tasks.filter((task) => task.assigneeId === userId);
+  const filteredTasks = myTasks.filter((task) => {
     const matchesSearch = task.title?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = filterStatus === "ALL" || task.status === filterStatus;
     return matchesSearch && matchesStatus;
@@ -97,14 +92,9 @@ export default function Tasks() {
   if (loading) return <LoadingSpinner message="Loading all tasks..." />;
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      className="p-6 min-h-screen text-text-base font-sans"
-    >
+    <div className="p-6 min-h-screen text-text-base font-sans">
       {/* Filtering and Search Controls */}
-      <div className="bg-background-light p-4 rounded-xl shadow-inner mb-6 flex flex-wrap gap-4 items-center">
+      {/* <div className="bg-background-light p-4 rounded-xl shadow-inner mb-6 flex flex-wrap gap-4 items-center">
         {roles.some((r) => r === "ADMIN" || r === "PROJECT_MANAGER" || r === "TEAM_LEAD") && (
           <button
             onClick={() => setShowCreateTaskModal(true)}
@@ -123,7 +113,6 @@ export default function Tasks() {
             className="w-full p-2 pl-10 border rounded-md bg-background-dark text-text-base focus:border-accent-green outline-none"
           />
         </div>
-
         <select
           value={filterStatus}
           onChange={(e) => setFilterStatus(e.target.value)}
@@ -136,52 +125,94 @@ export default function Tasks() {
             </option>
           ))}
         </select>
-
         <span className="text-sm text-text-muted">
-          Showing {filteredTasks.length} of {tasks.length} tasks
+          Showing {filteredTasks.length} of {myTasks.length} tasks
         </span>
-      </div>
+      </div> */}
 
-      {/* Task List */}
-      <div className="space-y-4">
+      {/* My Tasks Section */}
+      <div className="mb-8">
+        <h2 className="text-lg font-semibold text-text-base mb-4 text-center">My Tasks</h2>
         {filteredTasks.length === 0 ? (
-          <p className="text-center text-text-muted py-10 bg-background-light rounded-xl">
-            No tasks match your current filters.
+          <p className="text-text-muted text-sm text-center py-4 bg-background-light rounded-md">
+            You have no assigned tasks.
           </p>
         ) : (
-          filteredTasks.map((task) => (
-            <motion.div
-              key={task.id}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
-              onClick={() => navigate(`/tasks/${task.id}`)}
-              className="p-4 bg-background-light rounded-xl flex justify-between items-start gap-4 cursor-pointer hover:shadow-lg hover:border-accent-blue transition-all border border-background-dark"
-            >
-              <div className="flex-grow">
-                <h2 className="text-lg font-semibold hover:text-accent-green transition-colors">
-                  {task.title}
-                </h2>
-                <p className="text-xs text-text-muted mt-1 line-clamp-1">
-                  Project: {task.projectId ?? "N/A"} | Created: {task.createdAt?.toDateString() ?? "N/A"}
-                </p>
-                <p className={`text-xs mt-2 flex items-center gap-1 ${getPriorityColor(task.priority as TaskDtoPriorityEnum)}`}>
-                  <AlertTriangle size={14} /> Priority: {task.priority?.replace("_", " ") ?? "N/A"}
-                </p>
-              </div>
+          <ul className="space-y-3">
+            {filteredTasks.map((task) => (
+              <li
+                key={task.id}
+                className="p-4 bg-background-light border border-background-dark rounded-lg flex items-center gap-4 hover:border-accent-green hover:shadow-md transition-all duration-300"
+                onClick={() => navigate(`/tasks/${task.id}`)}
+              >
+                <Clock size={20} className="text-accent-green flex-shrink-0" />
+                <div className="flex-grow">
+                  <div className="flex justify-between items-center">
+                    <h3 className="text-base font-medium text-text-base">{task.title}</h3>
+                    <span className={`px-3 py-1 text-xs font-medium rounded-full border ${getStatusClasses(task.status)}`}>
+                      {task.status?.replace("_", " ") ?? "N/A"}
+                    </span>
+                  </div>
+                  <p className={`text-xs mt-1 flex items-center gap-1 ${getPriorityColor(task.priority)}`}>
+                    <AlertTriangle size={14} /> Priority: {task.priority?.replace("_", " ") ?? "N/A"}
+                  </p>
+                  <div className="flex justify-between items-center mt-1">
+                    <p className="text-xs text-text-muted">
+                      Project: {task.projectId ?? "N/A"}
+                    </p>
+                    <p className="text-xs text-text-muted">
+                      Created: {task.createdAt?.toDateString() ?? "N/A"}
+                    </p>
+                    {task.dueDate && (
+                      <p className="text-xs text-accent-yellow flex items-center gap-1">
+                        <Clock size={12} /> Due: {task.dueDate.toLocaleDateString()}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
 
-              <div className="flex flex-col items-end gap-2 flex-shrink-0">
-                <span className={`px-3 py-1 text-xs font-medium rounded-full border ${getStatusClasses(task.status as TaskDtoStatusEnum)}`}>
-                  {task.status?.replace("_", " ") || "N/A"}
-                </span>
-                {task.dueDate && (
-                  <span className="text-xs text-accent-yellow flex items-center gap-1">
-                    <Clock size={12} /> Due: {task.dueDate.toLocaleDateString()}
+      {/* All Tasks Section (Simplified) */}
+      <div>
+        <h2 className="text-lg font-semibold text-text-base mb-4 text-left">All Tasks</h2>
+        {tasks.length === 0 ? (
+          <p className="text-text-muted text-sm text-center py-10">
+            No tasks found. Create one to get started!
+          </p>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {tasks.map((task) => (
+              <motion.div
+                key={task.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
+                className="p-4 bg-background-light border border-background-light rounded-xl shadow-lg transition-all duration-300 hover:border-accent-green/80 hover:shadow-xl cursor-pointer"
+              >
+                <div className="flex flex-col gap-3">
+                  <div className="flex items-center gap-3">
+                    <Clock size={20} className="text-accent-green flex-shrink-0" />
+                    <h3 className="text-base font-semibold text-text-base">{task.title}</h3>
+                  </div>
+                  <span
+                    className={`self-start inline-flex items-center justify-center px-3 py-1 text-xs font-medium rounded-full border ${getStatusClasses(task.status)}`}
+                  >
+                    {task.status?.replace("_", " ") ?? "N/A"}
                   </span>
-                )}
-              </div>
-            </motion.div>
-          ))
+                  <button
+                    onClick={() => navigate(`/tasks/${task.id}`)}
+                    className="mt-2 px-3 py-1 bg-background-dark text-accent-green rounded-lg transition-colors hover:bg-accent-green/20 text-xs font-semibold w-full"
+                  >
+                    View Details
+                  </button>
+                </div>
+              </motion.div>
+            ))}
+          </div>
         )}
       </div>
 
@@ -197,6 +228,6 @@ export default function Tasks() {
           />
         </div>
       )}
-    </motion.div>
+    </div>
   );
 }

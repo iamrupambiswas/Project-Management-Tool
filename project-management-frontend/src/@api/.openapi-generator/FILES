@@ -1,3 +1,4 @@
+apis/admin-controller-api.ts
 apis/auth-controller-api.ts
 apis/index.ts
 apis/project-controller-api.ts
@@ -5,6 +6,7 @@ apis/task-controller-api.ts
 apis/team-controller-api.ts
 apis/user-controller-api.ts
 index.ts
+models/admin-analytics-dto.ts
 models/admin-dto.ts
 models/auth-response-dto.ts
 models/index.ts
@@ -15,5 +17,6 @@ models/register-company-request-dto.ts
 models/register-request-dto.ts
 models/task-dto.ts
 models/team-dto.ts
+models/user-analytics-dto.ts
 models/user-dto.ts
 runtime.ts

@@ -3,6 +3,7 @@ package com.biswas.project_management_backend.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -39,4 +40,7 @@ public class User {
     @ManyToOne
     @JoinColumn(name = "company_id")
     private Company company;
+
+    @Column(name = "last_active_date")
+    private LocalDate lastActiveDate;
 }

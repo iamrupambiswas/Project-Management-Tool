@@ -16,6 +16,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 
+import java.time.LocalDate;
 import java.util.*;
 
 @Service
@@ -112,11 +113,17 @@ public class UserService {
         User user = userRepository.findByUsername(authRequest.getUsername())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        Map<String, Object> claims = new HashMap<>();
-        if (user.getCompany() != null) claims.put("companyId", user.getCompany().getId());
-        String token = jwtUtil.generateToken(authRequest.getUsername(), claims);
+        user.setLastActiveDate(LocalDate.now());
+        userRepository.save(user);
 
+        Map<String, Object> claims = new HashMap<>();
+        if (user.getCompany() != null) {
+            claims.put("companyId", user.getCompany().getId());
+        }
+
+        String token = jwtUtil.generateToken(authRequest.getUsername(), claims);
         UserDto userDto = userDtoMapper.toDto(user);
+
         return new AuthResponseDto(token, userDto);
     }
 
