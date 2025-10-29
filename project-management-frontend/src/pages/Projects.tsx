@@ -86,7 +86,8 @@ export default function Projects() {
             {myProjects.map((project) => (
               <li
                 key={project.id}
-                className="p-4 bg-background-light border border-background-dark rounded-lg flex items-center gap-4 hover:border-accent-green hover:shadow-md transition-all duration-300"
+                onClick={() => navigate(`/projects/${project.id}`)}
+                className="p-4 bg-background-light border border-background-dark rounded-lg flex items-center gap-4 cursor-pointer hover:border-accent-green hover:shadow-md transition-all duration-300"
               >
                 <FolderOpen size={20} className="text-accent-green flex-shrink-0" />
                 <div className="flex-grow">

@@ -143,7 +143,7 @@ export default function Tasks() {
               <li
                 key={task.id}
                 className="p-4 bg-background-light border border-background-dark rounded-lg flex items-center gap-4 hover:border-accent-green hover:shadow-md transition-all duration-300"
-                onClick={() => navigate(`/tasks/${task.id}`)}
+                onClick={() => navigate(`/tasks/${task.id}`, { state: { from: 'tasks' } })}
               >
                 <Clock size={20} className="text-accent-green flex-shrink-0" />
                 <div className="flex-grow">
@@ -204,7 +204,7 @@ export default function Tasks() {
                     {task.status?.replace("_", " ") ?? "N/A"}
                   </span>
                   <button
-                    onClick={() => navigate(`/tasks/${task.id}`)}
+                    onClick={() => navigate(`/tasks/${task.id}`, { state: { from: 'tasks' } })}
                     className="mt-2 px-3 py-1 bg-background-dark text-accent-green rounded-lg transition-colors hover:bg-accent-green/20 text-xs font-semibold w-full"
                   >
                     View Details

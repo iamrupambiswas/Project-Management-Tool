@@ -107,7 +107,7 @@ export default function Teams() {
               <li
                 key={team.id}
                 onClick={() => (window.location.href = `/teams/${team.id}`)}
-                className="p-4 bg-background-light border border-background-dark rounded-lg flex items-center gap-4 hover:border-accent-blue hover:shadow-md transition-all duration-300"
+                className="p-4 bg-background-light border border-background-dark cursor-pointer rounded-lg flex items-center gap-4 hover:border-accent-blue hover:shadow-md transition-all duration-300"
               >
                 <Users size={20} className="text-accent-blue flex-shrink-0" />
                 <div className="flex-grow">
@@ -139,7 +139,7 @@ export default function Teams() {
                 <li
                   key={team.id}
                   onClick={() => (window.location.href = `/teams/${team.id}`)}
-                  className="p-4 bg-background-light border border-background-dark rounded-xl shadow-lg transition-colors hover:border-accent-blue duration-300"
+                  className="p-4 bg-background-light border border-background-dark rounded-xl shadow-lg transition-colors cursor-pointer hover:border-accent-blue duration-300"
                 >
                   <h2 className="text-base md:text-lg font-semibold text-text-base mb-1">
                     {team.name}

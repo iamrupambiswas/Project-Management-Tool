@@ -1,5 +1,6 @@
 apis/admin-controller-api.ts
 apis/auth-controller-api.ts
+apis/company-controller-api.ts
 apis/index.ts
 apis/project-controller-api.ts
 apis/task-controller-api.ts
@@ -9,6 +10,7 @@ index.ts
 models/admin-analytics-dto.ts
 models/admin-dto.ts
 models/auth-response-dto.ts
+models/company-dto.ts
 models/index.ts
 models/invite-request.ts
 models/login-request-dto.ts

@@ -17,6 +17,7 @@ import { Analytics } from "@vercel/analytics/react";
 import Tasks from './pages/Task';
 import TaskDetails from './pages/TaskDetails';
 import TeamDetails from './pages/TeamDetails';
+import ProfilePage from './pages/Profile';
 
 function App() {
   const isAuthenticated = useAuthStore((state) => state.token);
@@ -94,6 +95,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <TeamDetails />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/profile"
+              element={
+                <ProtectedRoute>
+                  <ProfilePage />
                 </ProtectedRoute>
               }
             />

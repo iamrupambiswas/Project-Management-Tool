@@ -3,6 +3,7 @@
 export * from './admin-analytics-dto';
 export * from './admin-dto';
 export * from './auth-response-dto';
+export * from './company-dto';
 export * from './invite-request';
 export * from './login-request-dto';
 export * from './project-dto';

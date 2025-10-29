@@ -790,6 +790,37 @@
         }
       }
     },
+    "/api/company/{companyId}": {
+      "get": {
+        "tags": [
+          "company-controller"
+        ],
+        "operationId": "getCompanyById",
+        "parameters": [
+          {
+            "name": "companyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompanyDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/admin/analytics/summary": {
       "get": {
         "tags": [
@@ -1163,6 +1194,24 @@
           "totalTeams": {
             "type": "integer",
             "format": "int64"
+          }
+        }
+      },
+      "CompanyDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "name": {
+            "type": "string"
+          },
+          "domain": {
+            "type": "string"
+          },
+          "joinCode": {
+            "type": "string"
           }
         }
       },

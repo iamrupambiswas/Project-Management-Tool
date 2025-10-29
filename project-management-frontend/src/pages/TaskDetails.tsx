@@ -1,4 +1,4 @@
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import LoadingSpinner from "../components/common/LoadingSpinner";
 import { getTaskById, updateTask } from "../services/taskService";
@@ -39,6 +39,10 @@ const getPriorityClasses = (priority?: TaskDtoPriorityEnum) => {
 
 export default function TaskDetails() {
   const { id } = useParams<{ id: string }>();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const currentUser = JSON.parse(localStorage.getItem("user") || "{}");
+  const isAdmin = currentUser?.role === "ADMIN";
   const taskId = Number(id);
   const [task, setTask] = useState<TaskDto | null>(null);
   const [assigneeName, setAssigneeName] = useState('Loading...');
@@ -48,7 +52,11 @@ export default function TaskDetails() {
   const [isEditing, setIsEditing] = useState(false);
   const [editedDescription, setEditedDescription] = useState('');
   
-  const navigate = useNavigate();
+  const from = (location.state as { from?: string; projectId?: number })?.from;
+  const projectIdFromState = (location.state as { projectId?: number })?.projectId;
+  const canUpdateStatus = 
+  currentUser?.role === 'ADMIN' || currentUser?.id === task?.assigneeId;
+
 
   // --- Data Fetching ---
   useEffect(() => {
@@ -144,19 +152,24 @@ export default function TaskDetails() {
       className="p-6 min-h-screen text-text-base font-sans"
     >
       <button
-        // Navigate back, potentially to the task list or project details
-        onClick={() => {
-            if (task.projectId) {
-                navigate(`/projects/${task.projectId}`);
-            } else {
-                navigate('/tasks');
-            }
-        }}
-        className="flex items-center gap-2 text-accent-green hover:text-accent-green/80 transition-colors mb-6 text-sm"
-      >
-        <ArrowLeft size={18} />
-        {task.projectId ? 'Back to Project' : 'Back to Tasks'}
-      </button>
+  onClick={() => {
+    if (from === 'project' && projectIdFromState) {
+      navigate(`/projects/${projectIdFromState}`);
+    } else if (from === 'tasks') {
+      navigate('/tasks');
+    } else if (task.projectId) {
+      // fallback — if user came via direct URL or unknown source
+      navigate(`/projects/${task.projectId}`);
+    } else {
+      navigate('/tasks');
+    }
+  }}
+  className="flex items-center gap-2 text-accent-green hover:text-accent-green/80 transition-colors mb-6 text-sm"
+>
+  <ArrowLeft size={18} />
+  {from === 'project' ? 'Back to Project' : 'Back to Tasks'}
+</button>
+
 
       {/* Task Header */}
       <div className="bg-background-light p-6 rounded-xl shadow-lg border border-accent-blue/50 mb-6">
@@ -274,7 +287,7 @@ export default function TaskDetails() {
                 <select
                     value={task.status || ''}
                     onChange={(e) => handleUpdate('status', e.target.value as TaskDtoStatusEnum)}
-                    disabled={isUpdating}
+                    disabled={isUpdating || !canUpdateStatus}
                     className="w-full p-2 border rounded-md bg-background-dark text-text-base focus:border-accent-blue outline-none disabled:opacity-50"
                 >
                     {/* Map over enum values for options */}
@@ -294,7 +307,7 @@ export default function TaskDetails() {
                 <select
                     value={task.priority || ''}
                     onChange={(e) => handleUpdate('priority', e.target.value as TaskDtoPriorityEnum)}
-                    disabled={isUpdating}
+                    disabled={isUpdating || !isAdmin}
                     className={`w-full p-2 border rounded-md bg-background-dark outline-none disabled:opacity-50 ${getPriorityClasses(task.priority as TaskDtoPriorityEnum)}`}
                 >
                     {/* Map over enum values for options */}

@@ -39,7 +39,7 @@ export default function Sidebar() {
           onClick={() => navigate("/members")}
         />
       </nav>
-      <div className="p-3 md:p-4">
+      {/* <div className="p-3 md:p-4">
         <button
           onClick={() => {
             logout();
@@ -50,7 +50,7 @@ export default function Sidebar() {
           <LogOut className="w-4 h-4 md:w-5 md:h-5" />
           Logout
         </button>
-      </div>
+      </div> */}
     </aside>
   );
 }

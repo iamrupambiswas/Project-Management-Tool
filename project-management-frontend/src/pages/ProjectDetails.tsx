@@ -146,7 +146,7 @@ export default function ProjectDetails() {
                     initial={{ opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.2 }}
-                    onClick={() => task.id && navigate(`/tasks/${task.id}`)}
+                    onClick={() => task.id && navigate(`/tasks/${task.id}`, { state: { from: 'project', projectId: project.id } })}
                     className="p-3 bg-background-dark rounded-lg flex flex-col sm:flex-row sm:justify-between sm:items-center text-sm border border-background-dark hover:border-accent-green/50 transition-colors cursor-pointer"
                 >
                     <span className="font-medium flex-grow truncate">{task.title}</span>
@@ -222,7 +222,7 @@ export default function ProjectDetails() {
       className="p-6 min-h-screen text-text-base font-sans"
     >
       <button
-        onClick={() => navigate(-1)}
+        onClick={() => navigate(`/projects`)}
         className="flex items-center gap-2 text-accent-green hover:text-accent-green/80 transition-colors mb-6 text-sm"
       >
         <ArrowLeft size={18} />
