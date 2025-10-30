@@ -5,7 +5,7 @@ A full‑stack Project Management application with a React + TypeScript + Vite f
 ## Project Overview
 
 - **Frontend**: SPA built with React (TypeScript), Vite, TailwindCSS, Zustand, and React Router.
-- **Backend**: Spring Boot 3 (Java 17) with JPA, Security (JWT), and Flyway migrations.
+- **Backend**: Spring Boot 3 (Java 17) with JPA, Spring AI, Security (JWT), and Flyway migrations.
 - **Database**: PostgreSQL.
 - **API Docs**: Springdoc OpenAPI UI exposed by the backend.
 - **Dev Experience**: Hot reloading on the frontend, standard Maven build on the backend.
@@ -127,6 +127,46 @@ npm run preview
 - Vite dev server runs at http://localhost:5173 (host exposed via `vite --host`).
 - Ensure API base URL points to the backend (e.g., `http://localhost:8080`).
 
+## AI Integration (Spring AI)
+
+Implemented using **Spring AI** + **OpenAI GPT-5-Nano**, enabling:
+
+- **Context-aware task elaboration**  
+- **Project-based summaries**  
+- **Expandable structure** for AI insights & analytics  
+
+#### Environment Variables
+
+```env
+SPRING_AI_OPENAI_API_KEY=<your-api-key>
+SPRING_AI_OPENAI_CHAT_MODEL=gpt-5-nano
+```
+
+## CSV Upload Feature
+
+Admins can upload **`.csv` files** with the following headers:
+
+```csv
+name,email,role
+```
+The system parses and automatically adds employees to the database.
+
+## CI/CD (GitHub Actions)
+
+The project uses **GitHub Actions** for automated deployment:
+
+- **Backend** → Deployed to **Render**  
+- **Frontend** → Deployed to **Vercel**  
+- **Triggered** on **every push to `main`**
+
+#### Workflow Summary
+
+| Service  | Platform | Trigger       |
+|--------|----------|---------------|
+| Backend  | Render   | `push` to `main` |
+| Frontend | Vercel   | `push` to `main` |
+
+
 ## Environment Configuration
 
 The Docker Compose file sets sensible defaults:
@@ -171,7 +211,7 @@ Thanks to these amazing people for their contributions 💪
 | Contributor | Contribution |
 |-------------|---------------|
 | <a href="https://github.com/AbhishekPoojary"><img src="https://avatars.githubusercontent.com/AbhishekPoojary" width="60" height="60" style="border-radius:50%" /></a><br>[@Abhishek S Poojary](https://github.com/AbhishekPoojary) | Improved README.md |
-| <a href="https://github.com/chathumsp02"><img src="https://avatars.githubusercontent.com/chathumsp02" width="60" height="60" style="border-radius:50%" /></a><br>[@chathum_sp](https://github.com/chathumsp02) | Redesigned the Login and Register pages with a modern split-screen layout, animated visuals, and improved accessibility for a polished user experience. |
+| <a href="https://github.com/chathumsp02"><img src="https://avatars.githubusercontent.com/chathumsp02" width="60" height="60" style="border-radius:50%" /></a><br>[@chathum_sp](https://github.com/chathumsp02) | 1. Redesigned the Login and Register pages with a modern split-screen layout, animated visuals, and improved accessibility for a polished user experience.<br><br>2. Designed the 404 page. |
 
 
 ## Contribution
