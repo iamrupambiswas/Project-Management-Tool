@@ -26,3 +26,21 @@ export const registerCompany = async (
   const response = await api.post("/auth/register/company", data);
   return response.data;
 };
+
+
+
+export const changePassword = async (
+  oldPassword: string,
+  newPassword: string
+): Promise<string> => {
+  try {
+    const res = await api.post("/auth/change-password", {
+      oldPassword,
+      newPassword,
+    });
+    return res.data.message || "Password changed successfully.";
+  } catch (err: any) {
+    const msg = err.response?.data?.message || "Failed to change password.";
+    throw new Error(msg);
+  }
+};

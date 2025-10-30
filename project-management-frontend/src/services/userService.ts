@@ -21,6 +21,11 @@ export const getUserById = async (id: number): Promise<UserDto> => {
   }
 };
 
+export const updateUser = async (userId: string | number, userDto: UserDto) => {
+  const res = await api.put(`/users/${userId}`, userDto);
+  return res.data;
+};
+
 export const updateUserRoles = async (userId: number, roles: string[]) => {
   const res = await api.put(`/users/${userId}/roles`, roles);
   return res.data;

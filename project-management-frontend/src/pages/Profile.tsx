@@ -3,6 +3,7 @@ import { Clipboard, Check, ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { getCompany } from "../services/companyService";
 import { CompanyDto } from "../@api/models";
+import ChangePasswordModal from "../components/modals/ChangePasswordModal";
 
 interface User {
   id: number;
@@ -17,6 +18,7 @@ export default function ProfilePage() {
   const [company, setCompany] = useState<CompanyDto | null>(null);
   const [copied, setCopied] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -96,6 +98,16 @@ export default function ProfilePage() {
           <ProfileField label="Roles" value={user.roles.join(", ")} />
           <ProfileField label="User ID" value={String(user.id)} />
         </div>
+
+        <div className="mt-6">
+          <button
+            onClick={() => setShowPasswordModal(true)}
+            className="px-4 py-2 bg-accent-blue text-white text-sm rounded-md hover:bg-accent-blue/90 transition"
+          >
+            Change Password
+          </button>
+        </div>
+
       </section>
 
       {/* --- Company Info --- */}
@@ -140,6 +152,10 @@ export default function ProfilePage() {
           </div>
 
         </section>
+      )}
+
+      {showPasswordModal && (
+        <ChangePasswordModal onClose={() => setShowPasswordModal(false)} />
       )}
     </div>
   );
