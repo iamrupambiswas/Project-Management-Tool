@@ -44,7 +44,7 @@ public class TaskService {
 
     public TaskDto createTask(TaskDto dto) {
         Task task = dtoMapper.toEntity(dto);
-        Project project = projectRepository.getById(dto.getProjectId());
+        Project project = projectRepository.getById(dto.getProject().getId());
         User creator = userRepository.getById(dto.getCreatorId());
         User assignee = userRepository.getById(dto.getAssigneeId());
         Company company = companyRepository.getById(dto.getCompanyId());

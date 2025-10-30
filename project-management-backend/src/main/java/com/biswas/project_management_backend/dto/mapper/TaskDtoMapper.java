@@ -2,10 +2,14 @@ package com.biswas.project_management_backend.dto.mapper;
 
 import com.biswas.project_management_backend.dto.TaskDto;
 import com.biswas.project_management_backend.model.Task;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public class TaskDtoMapper {
+
+    @Autowired
+    ProjectDtoMapper projectDtoMapper;
 
     // Convert Task entity to DTO
     public TaskDto toDto(Task task) {
@@ -19,7 +23,7 @@ public class TaskDtoMapper {
                 .dueDate(task.getDueDate())
                 .status(task.getStatus())
                 .priority(task.getPriority())
-                .projectId(task.getProject() != null ? task.getProject().getId() : null)
+                .project(projectDtoMapper.toDto(task.getProject()))
                 .assigneeId(task.getAssignee() != null ? task.getAssignee().getId() : null)
                 .creatorId(task.getCreator() != null ? task.getCreator().getId() : null)
                 .companyId(task.getCompany() != null ? task.getCompany().getId() : null)

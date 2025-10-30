@@ -1,6 +1,7 @@
 package com.biswas.project_management_backend.controller;
 
 import com.biswas.project_management_backend.dto.ProjectDto;
+import com.biswas.project_management_backend.model.enm.ProjectStatus;
 import com.biswas.project_management_backend.service.ProjectService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/projects")
@@ -40,6 +42,15 @@ public class ProjectController {
     public ResponseEntity<ProjectDto> updateProject(@RequestBody ProjectDto projectDto) {
         ProjectDto updatedProject = projectService.updateProject(projectDto);
         return ResponseEntity.ok(updatedProject);
+    }
+
+    @PutMapping("/{id}/status")
+    public ResponseEntity<ProjectDto> updateProjectStatus(
+            @PathVariable Long id,
+            @RequestBody Map<String, String> request) {
+        String status = request.get("status");
+        ProjectDto updated = projectService.updateProjectStatus(id, ProjectStatus.valueOf(status));
+        return ResponseEntity.ok(updated);
     }
 
     @DeleteMapping("/{id}")
