@@ -16,10 +16,12 @@ import {
   Users2,
   Activity,
   AlertTriangle,
+  Upload,
 } from "lucide-react";
 import { useAuthStore } from "../../store/authStore";
 import { getAdminAnalytics } from "../../services/analyticsService";
 import type { AdminAnalyticsDto } from "../../@api/models";
+import EmployeeUploadModal from "../modals/EmployeeUploadModal";
 
 ChartJS.register(ArcElement, Tooltip, Legend, BarElement, CategoryScale, LinearScale);
 
@@ -27,6 +29,7 @@ export default function AdminDashboard() {
   const { companyId } = useAuthStore();
   const [analytics, setAnalytics] = useState<AdminAnalyticsDto | null>(null);
   const [loading, setLoading] = useState(true);
+  const [showUploadModal, setShowUploadModal] = useState(false);
 
   useEffect(() => {
     const fetchAnalytics = async () => {
@@ -93,6 +96,20 @@ export default function AdminDashboard() {
 
   return (
     <div className="p-6 space-y-8">
+      {/* Upload Employees Button */}
+      <div className="flex justify-end">
+        <button
+          onClick={() => setShowUploadModal(true)}
+          className="flex items-center gap-2 px-4 py-2 text-sm text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-md transition-all duration-200"
+        >
+          <Upload size={16} />
+          Upload Employee CSV
+        </button>
+      </div>
+
+      {/* Upload Modal */}
+      {showUploadModal && <EmployeeUploadModal onClose={() => setShowUploadModal(false)} />}
+
       {/* Summary Widgets */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
         {stats.map((stat, i) => {
