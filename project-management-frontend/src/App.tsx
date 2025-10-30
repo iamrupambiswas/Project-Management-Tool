@@ -18,12 +18,13 @@ import Tasks from './pages/Task';
 import TaskDetails from './pages/TaskDetails';
 import TeamDetails from './pages/TeamDetails';
 import ProfilePage from './pages/Profile';
+import NotFound from "./pages/NotFound"; 
 
 function App() {
   const isAuthenticated = useAuthStore((state) => state.token);
   const location = useLocation();
 
-  const hideLayout = location.pathname === "/login" || location.pathname === "/register";
+  const hideLayout = location.pathname === "/login" || location.pathname === "/register" || location.pathname === "/register-company";
 
   return (
     <div className="flex h-screen bg-background-dark text-text-base">
@@ -107,6 +108,8 @@ function App() {
               }
             />
 
+            {/* 404 Route - MUST BE LAST */}
+            <Route path="*" element={<NotFound />} />
           </Routes>
 
           <Analytics />
