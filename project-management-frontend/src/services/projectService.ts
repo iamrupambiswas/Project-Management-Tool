@@ -1,4 +1,4 @@
-import { ProjectDto } from "../@api";
+import { ProjectDto, ProjectDtoStatusEnum } from "../@api";
 import api from "./api"
 
 // Fetch all projects
@@ -37,3 +37,25 @@ export const getProjectById = async(
         throw err;
     }
 }
+
+// Update an project
+export const updateProject = async (id: number, project: ProjectDto): Promise<ProjectDto> => {
+    try {
+        const res = await api.put(`/projects/${id}`, project);
+        return res.data;
+    } catch (err) {
+        console.error(`Error updating project with id ${id}:`, err);
+        throw err;
+    }
+};
+
+export const updateProjectStatus = async (id: number, status: ProjectDtoStatusEnum): Promise<ProjectDto> => {
+    try {
+        const res = await api.put(`/projects/${id}/status`, { status }); // 👈 send JSON object
+        return res.data;
+    } catch (err) {
+        console.error(`Error updating project with id ${id}:`, err);
+        throw err;
+    }
+};
+  

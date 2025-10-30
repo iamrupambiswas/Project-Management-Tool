@@ -13,6 +13,14 @@
  */
 
 import { mapValues } from '../runtime';
+import type { ProjectDto } from './project-dto';
+import {
+    ProjectDtoFromJSON,
+    ProjectDtoFromJSONTyped,
+    ProjectDtoToJSON,
+    ProjectDtoToJSONTyped,
+} from './project-dto';
+
 /**
  * 
  * @export
@@ -63,10 +71,10 @@ export interface TaskDto {
     priority?: TaskDtoPriorityEnum;
     /**
      * 
-     * @type {number}
+     * @type {ProjectDto}
      * @memberof TaskDto
      */
-    projectId?: number;
+    project?: ProjectDto;
     /**
      * 
      * @type {number}
@@ -135,7 +143,7 @@ export function TaskDtoFromJSONTyped(json: any, ignoreDiscriminator: boolean): T
         'dueDate': json['dueDate'] == null ? undefined : (new Date(json['dueDate'])),
         'status': json['status'] == null ? undefined : json['status'],
         'priority': json['priority'] == null ? undefined : json['priority'],
-        'projectId': json['projectId'] == null ? undefined : json['projectId'],
+        'project': json['project'] == null ? undefined : ProjectDtoFromJSON(json['project']),
         'assigneeId': json['assigneeId'] == null ? undefined : json['assigneeId'],
         'creatorId': json['creatorId'] == null ? undefined : json['creatorId'],
         'companyId': json['companyId'] == null ? undefined : json['companyId'],
@@ -160,7 +168,7 @@ export function TaskDtoToJSONTyped(value?: TaskDto | null, ignoreDiscriminator: 
         'dueDate': value['dueDate'] == null ? value['dueDate'] : value['dueDate'].toISOString().substring(0,10),
         'status': value['status'],
         'priority': value['priority'],
-        'projectId': value['projectId'],
+        'project': ProjectDtoToJSON(value['project']),
         'assigneeId': value['assigneeId'],
         'creatorId': value['creatorId'],
         'companyId': value['companyId'],

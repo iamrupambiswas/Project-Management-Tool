@@ -31,6 +31,10 @@ import {
     RegisterRequestDtoToJSON,
 } from '../models/index';
 
+export interface ChangePasswordRequest {
+    requestBody: { [key: string]: string; };
+}
+
 export interface LoginRequest {
     loginRequestDto: LoginRequestDto;
 }
@@ -47,6 +51,51 @@ export interface Register1Request {
  * 
  */
 export class AuthControllerApi extends runtime.BaseAPI {
+
+    /**
+     */
+    async changePasswordRaw(requestParameters: ChangePasswordRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<object>> {
+        if (requestParameters['requestBody'] == null) {
+            throw new runtime.RequiredError(
+                'requestBody',
+                'Required parameter "requestBody" was null or undefined when calling changePassword().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("bearerAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+
+        let urlPath = `/api/auth/change-password`;
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: requestParameters['requestBody'],
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse<any>(response);
+    }
+
+    /**
+     */
+    async changePassword(requestParameters: ChangePasswordRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
+        const response = await this.changePasswordRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
 
     /**
      */

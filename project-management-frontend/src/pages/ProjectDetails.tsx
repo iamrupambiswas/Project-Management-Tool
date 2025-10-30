@@ -175,42 +175,46 @@ export default function ProjectDetails() {
   );
 
   // Component to list and manage members
-  const ProjectMembers = () => (
-    <div className="mt-6">
-      <div className="flex justify-between items-center mb-4">
-        <h3 className="text-lg font-semibold">Team Members ({project.memberCount ?? 0})</h3>
-        <button
-          onClick={() => setShowInviteModal(true)}
-          className="flex items-center gap-1 bg-accent-blue text-text-base px-3 py-1 rounded-md transition-colors hover:bg-opacity-80 text-sm"
-        >
-          <Users size={16} /> Invite Member
-        </button>
-      </div>
-      
-      <ul className="space-y-3">
-        {/* Iterate over actual project members if available, falling back to placeholders */}
-        {project.team?.memberEmails && project.team.memberEmails.length > 0 ? (
-            Array.from(project.team.memberEmails).map((member: any) => (
-                <li key={member.id} className="p-3 bg-background-dark rounded-lg flex justify-between items-center text-sm">
-                    <span className="font-medium">{member.username ?? member.email}</span>
-                    <span className="text-text-muted text-xs">{member.role?.replace('_', ' ') ?? 'Member'}</span>
-                </li>
-            ))
+  const ProjectMembers = () => {
+    const members = project.members || project.team?.members || [];
+
+    return (
+      <div className="mt-6">
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-lg font-semibold">
+            Team Members ({members.length})
+          </h3>
+        </div>
+
+        {members.length === 0 ? (
+          <p className="text-text-muted text-sm py-4 italic">
+            No members have been added to this team yet.
+          </p>
         ) : (
-            <>
-                <li className="p-3 bg-background-dark rounded-lg flex justify-between items-center text-sm">
-                    <span className="font-medium">User A (PM)</span>
-                    <span className="text-text-muted text-xs">Project Manager</span>
-                </li>
-                <li className="p-3 bg-background-dark rounded-lg flex justify-between items-center text-sm">
-                    <span className="font-medium">User B</span>
-                    <span className="text-text-muted text-xs">Member</span>
-                </li>
-            </>
+          <ul className="space-y-3">
+            {members.map((member: any) => (
+              <li
+                key={member.id}
+                className="p-3 bg-background-dark rounded-lg flex justify-between items-center text-sm"
+              >
+                <div className="flex flex-col">
+                  <span className="font-medium">
+                    {member.username || member.email || "Unnamed User"}
+                  </span>
+                  <span className="text-xs text-text-muted">
+                    {member.email}
+                  </span>
+                </div>
+                <span className="text-text-muted text-xs capitalize">
+                  {member.role?.replace("_", " ") || "Member"}
+                </span>
+              </li>
+            ))}
+          </ul>
         )}
-      </ul>
-    </div>
-  );
+      </div>
+    );
+  };
 
   // --- Main Render ---
 
