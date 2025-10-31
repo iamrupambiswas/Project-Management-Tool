@@ -158,7 +158,7 @@ export default function Tasks() {
                   </p>
                   <div className="flex justify-between items-center mt-1">
                     <p className="text-xs text-text-muted">
-                      Project: {task.projectId ?? "N/A"}
+                      Project: {task.project?.id ?? "N/A"}
                     </p>
                     <p className="text-xs text-text-muted">
                       Created: {task.createdAt?.toDateString() ?? "N/A"}

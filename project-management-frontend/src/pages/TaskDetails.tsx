@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
-import FloatingAIAssistant from "../components/common/floatingAiAssistant";
+import FloatingAIAssistant from "../components/common/FloatingAiAssistant";
 
 // Utility to get Tailwind classes based on task status
 const getStatusClasses = (status?: TaskDtoStatusEnum) => {
