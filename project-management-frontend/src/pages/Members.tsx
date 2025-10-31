@@ -201,7 +201,12 @@ export default function Members() {
             >
               <div className="flex items-center gap-4">
                 <img
-                  src={`https://i.pravatar.cc/40?u=${member.id}`}
+                  src={
+                    member.profileImageUrl ||
+                    `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                      member.username ?? "User"
+                    )}&background=E0E7FF&color=3730A3`
+                  }
                   alt={member.username}
                   className="w-10 h-10 rounded-full border-2 border-accent-blue/50"
                 />

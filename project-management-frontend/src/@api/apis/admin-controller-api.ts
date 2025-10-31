@@ -16,13 +16,13 @@
 import * as runtime from '../runtime';
 import type {
   AdminAnalyticsDto,
-  UploadUserCSVRequest,
+  UploadProfileImageRequest,
 } from '../models/index';
 import {
     AdminAnalyticsDtoFromJSON,
     AdminAnalyticsDtoToJSON,
-    UploadUserCSVRequestFromJSON,
-    UploadUserCSVRequestToJSON,
+    UploadProfileImageRequestFromJSON,
+    UploadProfileImageRequestToJSON,
 } from '../models/index';
 
 export interface GetAnalyticsSummaryRequest {
@@ -31,8 +31,8 @@ export interface GetAnalyticsSummaryRequest {
     dateTo?: string;
 }
 
-export interface UploadUserCSVOperationRequest {
-    uploadUserCSVRequest?: UploadUserCSVRequest;
+export interface UploadUserCSVRequest {
+    uploadProfileImageRequest?: UploadProfileImageRequest;
 }
 
 /**
@@ -96,7 +96,7 @@ export class AdminControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async uploadUserCSVRaw(requestParameters: UploadUserCSVOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<string>> {
+    async uploadUserCSVRaw(requestParameters: UploadUserCSVRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<string>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -119,7 +119,7 @@ export class AdminControllerApi extends runtime.BaseAPI {
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: UploadUserCSVRequestToJSON(requestParameters['uploadUserCSVRequest']),
+            body: UploadProfileImageRequestToJSON(requestParameters['uploadProfileImageRequest']),
         }, initOverrides);
 
         if (this.isJsonMime(response.headers.get('content-type'))) {
@@ -131,7 +131,7 @@ export class AdminControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async uploadUserCSV(requestParameters: UploadUserCSVOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<string> {
+    async uploadUserCSV(requestParameters: UploadUserCSVRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<string> {
         const response = await this.uploadUserCSVRaw(requestParameters, initOverrides);
         return await response.value();
     }

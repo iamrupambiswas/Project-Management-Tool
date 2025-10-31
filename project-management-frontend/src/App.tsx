@@ -33,7 +33,7 @@ function App() {
       <div className="flex-1 flex flex-col overflow-hidden">
         {isAuthenticated && !hideLayout && <Topbar />}
 
-        <main className="flex-1 overflow-y-auto bg-background-content">
+        <main className="flex-1 overflow-y-auto scroll-smooth bg-background-content">
           <Routes>
             <Route path="/" element={<Navigate to="/dashboard" />} />
             <Route path="/login" element={<Login />} />

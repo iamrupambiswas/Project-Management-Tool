@@ -1,6 +1,7 @@
 apis/admin-controller-api.ts
 apis/ai-controller-api.ts
 apis/auth-controller-api.ts
+apis/common-controller-api.ts
 apis/company-controller-api.ts
 apis/index.ts
 apis/project-controller-api.ts
@@ -21,7 +22,7 @@ models/register-company-request-dto.ts
 models/register-request-dto.ts
 models/task-dto.ts
 models/team-dto.ts
-models/upload-user-csv-request.ts
+models/upload-profile-image-request.ts
 models/user-analytics-dto.ts
 models/user-dto.ts
 runtime.ts

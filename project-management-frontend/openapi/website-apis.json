@@ -459,6 +459,44 @@
         }
       }
     },
+    "/api/common/upload-profile-image": {
+      "post": {
+        "tags": [
+          "common-controller"
+        ],
+        "operationId": "uploadProfileImage",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "required": [
+                  "file"
+                ],
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/auth/register": {
       "post": {
         "tags": [
@@ -1053,10 +1091,48 @@
           }
         }
       }
+    },
+    "/api/common/delete-profile-image": {
+      "delete": {
+        "tags": [
+          "common-controller"
+        ],
+        "operationId": "deleteProfileImage",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
     "schemas": {
+      "CompanyDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "name": {
+            "type": "string"
+          },
+          "domain": {
+            "type": "string"
+          },
+          "joinCode": {
+            "type": "string"
+          }
+        }
+      },
       "UserDto": {
         "type": "object",
         "properties": {
@@ -1076,6 +1152,16 @@
             "items": {
               "type": "string"
             }
+          },
+          "companyDto": {
+            "$ref": "#/components/schemas/CompanyDto"
+          },
+          "lastActive": {
+            "type": "string",
+            "format": "date"
+          },
+          "profileImageUrl": {
+            "type": "string"
           }
         }
       },
@@ -1339,24 +1425,6 @@
           "totalTeams": {
             "type": "integer",
             "format": "int64"
-          }
-        }
-      },
-      "CompanyDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "name": {
-            "type": "string"
-          },
-          "domain": {
-            "type": "string"
-          },
-          "joinCode": {
-            "type": "string"
           }
         }
       },

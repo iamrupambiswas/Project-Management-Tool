@@ -6,31 +6,31 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class TaskDtoMapper {
+public class TaskDtoMapper implements DtoMapper<Task, TaskDto> {
 
     @Autowired
-    ProjectDtoMapper projectDtoMapper;
+    private ProjectDtoMapper projectDtoMapper;
 
-    // Convert Task entity to DTO
+    @Override
     public TaskDto toDto(Task task) {
         if (task == null) return null;
 
-        return TaskDto.builder()
-                .id(task.getId())
-                .title(task.getTitle())
-                .description(task.getDescription())
-                .createdAt(task.getCreatedAt())
-                .dueDate(task.getDueDate())
-                .status(task.getStatus())
-                .priority(task.getPriority())
-                .project(projectDtoMapper.toDto(task.getProject()))
-                .assigneeId(task.getAssignee() != null ? task.getAssignee().getId() : null)
-                .creatorId(task.getCreator() != null ? task.getCreator().getId() : null)
-                .companyId(task.getCompany() != null ? task.getCompany().getId() : null)
-                .build();
+        TaskDto dto = new TaskDto();
+        dto.setId(task.getId());
+        dto.setTitle(task.getTitle());
+        dto.setDescription(task.getDescription());
+        dto.setCreatedAt(task.getCreatedAt());
+        dto.setDueDate(task.getDueDate());
+        dto.setStatus(task.getStatus());
+        dto.setPriority(task.getPriority());
+        dto.setProject(projectDtoMapper.toDto(task.getProject()));
+        dto.setAssigneeId(task.getAssignee() != null ? task.getAssignee().getId() : null);
+        dto.setCreatorId(task.getCreator() != null ? task.getCreator().getId() : null);
+        dto.setCompanyId(task.getCompany() != null ? task.getCompany().getId() : null);
+        return dto;
     }
 
-    // Convert DTO back to Task entity
+    @Override
     public Task toEntity(TaskDto dto) {
         if (dto == null) return null;
 
@@ -42,7 +42,6 @@ public class TaskDtoMapper {
         task.setDueDate(dto.getDueDate());
         task.setStatus(dto.getStatus());
         task.setPriority(dto.getPriority());
-        // Note: Project, Assignee, Creator, and Company must be set separately in the service if needed
         return task;
     }
 }

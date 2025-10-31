@@ -69,9 +69,21 @@ export default function Topbar() {
             className="focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-blue rounded-full"
           >
             <img
-              src="https://i.pravatar.cc/40?u=a_user_id"
+              src={
+                (() => {
+                  const storedUser = localStorage.getItem("user");
+                  if (storedUser) {
+                    const user = JSON.parse(storedUser);
+                    return (
+                      user.profileImageUrl ||
+                      `https://ui-avatars.com/api/?name=${encodeURIComponent(user.username || "User")}`
+                    );
+                  }
+                  return "https://ui-avatars.com/api/?name=User";
+                })()
+              }
               alt="User profile"
-              className="w-8 h-8 md:w-10 md:h-10 rounded-full border-2 border-accent-blue cursor-pointer"
+              className="w-8 h-8 md:w-10 md:h-10 rounded-full border-2 border-accent-blue cursor-pointer object-cover"
             />
           </button>
 
@@ -98,7 +110,7 @@ export default function Topbar() {
                 <Settings size={16} /> Settings
               </Link>
               <button
-                onClick={()=>{
+                onClick={() => {
                   logout();
                   navigate("/login");
                 }}

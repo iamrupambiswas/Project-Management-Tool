@@ -100,3 +100,21 @@ html {
 .animate-fadeIn {
   animation: fadeIn 0.3s ease-in-out forwards;
 }
+
+html, body, main {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch; /* bounce/inertia */
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(100, 100, 100, 0.3) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(100, 100, 100, 0.4);
+  border-radius: 4px;
+}

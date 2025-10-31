@@ -5,87 +5,70 @@ import com.biswas.project_management_backend.dto.UserDto;
 import com.biswas.project_management_backend.model.Company;
 import com.biswas.project_management_backend.model.Team;
 import com.biswas.project_management_backend.model.User;
-import com.biswas.project_management_backend.repository.CompanyRepository;
-import com.biswas.project_management_backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Component
-public class TeamDtoMapper {
+public class TeamDtoMapper implements DtoMapper<Team, TeamDto> {
 
     @Autowired
-    CompanyRepository companyRepository;
+    private UserDtoMapper userDtoMapper;
 
-    @Autowired
-    UserRepository userRepository;
-
-    @Autowired
-    UserDtoMapper userDtoMapper;
-
+    @Override
     public TeamDto toDto(Team team) {
         if (team == null) return null;
 
-        // Handle null-safe member email mapping
-        List<String> memberEmails = team.getMembers() != null
-                ? team.getMembers().stream()
-                .map(User::getEmail)
-                .toList()
-                : Collections.emptyList();
+        TeamDto dto = new TeamDto();
+        dto.setId(team.getId());
+        dto.setName(team.getName());
+        dto.setDescription(team.getDescription());
 
-        // Create a mutable list for UserDto mapping
+        List<String> memberEmails = new ArrayList<>();
         List<UserDto> members = new ArrayList<>();
 
         if (team.getMembers() != null) {
             for (User user : team.getMembers()) {
-                UserDto userDto = userDtoMapper.toDto(user);
-                members.add(userDto);
+                memberEmails.add(user.getEmail());
+                members.add(userDtoMapper.toDto(user));
             }
+        } else {
+            memberEmails = Collections.emptyList();
+            members = Collections.emptyList();
         }
 
-        // Build the DTO using Lombok's builder
-        return TeamDto.builder()
-                .id(team.getId())
-                .name(team.getName())
-                .description(team.getDescription())
-                .memberEmails(memberEmails)
-                .members(members)
-                .companyId(
-                        team.getCompany() != null
-                                ? team.getCompany().getId()
-                                : null
-                )
-                .build();
+        dto.setMemberEmails(memberEmails);
+        dto.setMembers(members);
+        dto.setCompanyId(team.getCompany() != null ? team.getCompany().getId() : null);
+
+        return dto;
     }
 
+    @Override
     public Team toEntity(TeamDto dto) {
         if (dto == null) return null;
 
-        Team entity = new Team();
+        Team team = new Team();
+        team.setId(dto.getId());
+        team.setName(dto.getName());
+        team.setDescription(dto.getDescription());
+        return team;
+    }
 
-        if (dto.getId() != null) {
-            entity.setId(dto.getId());
-        }
-        entity.setName(dto.getName());
-        entity.setDescription(dto.getDescription());
+    public Team toEntity(TeamDto dto, Company company, Set<User> members) {
+        if (dto == null) return null;
 
-        Company company = companyRepository.findById(dto.getCompanyId())
-                .orElseThrow(() -> new RuntimeException("Company not found with id: " + dto.getCompanyId()));
-        entity.setCompany(company);
-
-        if (dto.getMemberEmails() != null && !dto.getMemberEmails().isEmpty()) {
-            Set<User> members = dto.getMemberEmails().stream()
-                    .map(email -> userRepository.findByEmail(email)
-                            .orElseThrow(() -> new RuntimeException("User not found: " + email)))
-                    .collect(Collectors.toSet());
-            entity.setMembers(members);
-        }
-
-        return entity;
+        Team team = new Team();
+        team.setId(dto.getId());
+        team.setName(dto.getName());
+        team.setDescription(dto.getDescription());
+        team.setCompany(company);
+        team.setMembers(members != null ? members : new HashSet<>());
+        return team;
     }
 }

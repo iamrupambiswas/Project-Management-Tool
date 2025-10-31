@@ -2,30 +2,32 @@ package com.biswas.project_management_backend.dto.mapper;
 
 import com.biswas.project_management_backend.dto.CompanyDto;
 import com.biswas.project_management_backend.model.Company;
+import org.springframework.stereotype.Component;
 
-public class CompanyDtoMapper {
+@Component
+public class CompanyDtoMapper implements DtoMapper<Company, CompanyDto> {
 
-    public static CompanyDto toDTO(Company company) {
-        if (company == null) {
-            return null;
-        }
-        return CompanyDto.builder()
-                .id(company.getId())
-                .name(company.getName())
-                .domain(company.getDomain())
-                .joinCode(company.getJoinCode())
-                .build();
+    @Override
+    public CompanyDto toDto(Company company) {
+        if (company == null) return null;
+
+        CompanyDto dto = new CompanyDto();
+        dto.setId(company.getId());
+        dto.setName(company.getName());
+        dto.setDomain(company.getDomain());
+        dto.setJoinCode(company.getJoinCode());
+        return dto;
     }
 
-    public static Company toEntity(CompanyDto dto) {
-        if (dto == null) {
-            return null;
-        }
-        return Company.builder()
-                .id(dto.getId())
-                .name(dto.getName())
-                .domain(dto.getDomain())
-                .joinCode(dto.getJoinCode())
-                .build();
+    @Override
+    public Company toEntity(CompanyDto dto) {
+        if (dto == null) return null;
+
+        Company company = new Company();
+        company.setId(dto.getId());
+        company.setName(dto.getName());
+        company.setDomain(dto.getDomain());
+        company.setJoinCode(dto.getJoinCode());
+        return company;
     }
 }

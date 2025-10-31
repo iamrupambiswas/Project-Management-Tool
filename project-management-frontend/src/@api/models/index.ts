@@ -12,6 +12,6 @@ export * from './register-company-request-dto';
 export * from './register-request-dto';
 export * from './task-dto';
 export * from './team-dto';
-export * from './upload-user-csv-request';
+export * from './upload-profile-image-request';
 export * from './user-analytics-dto';
 export * from './user-dto';

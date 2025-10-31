@@ -13,6 +13,14 @@
  */
 
 import { mapValues } from '../runtime';
+import type { CompanyDto } from './company-dto';
+import {
+    CompanyDtoFromJSON,
+    CompanyDtoFromJSONTyped,
+    CompanyDtoToJSON,
+    CompanyDtoToJSONTyped,
+} from './company-dto';
+
 /**
  * 
  * @export
@@ -43,6 +51,24 @@ export interface UserDto {
      * @memberof UserDto
      */
     roles?: Set<string>;
+    /**
+     * 
+     * @type {CompanyDto}
+     * @memberof UserDto
+     */
+    companyDto?: CompanyDto;
+    /**
+     * 
+     * @type {Date}
+     * @memberof UserDto
+     */
+    lastActive?: Date;
+    /**
+     * 
+     * @type {string}
+     * @memberof UserDto
+     */
+    profileImageUrl?: string;
 }
 
 /**
@@ -66,6 +92,9 @@ export function UserDtoFromJSONTyped(json: any, ignoreDiscriminator: boolean): U
         'username': json['username'] == null ? undefined : json['username'],
         'email': json['email'] == null ? undefined : json['email'],
         'roles': json['roles'] == null ? undefined : new Set(json['roles']),
+        'companyDto': json['companyDto'] == null ? undefined : CompanyDtoFromJSON(json['companyDto']),
+        'lastActive': json['lastActive'] == null ? undefined : (new Date(json['lastActive'])),
+        'profileImageUrl': json['profileImageUrl'] == null ? undefined : json['profileImageUrl'],
     };
 }
 
@@ -84,6 +113,9 @@ export function UserDtoToJSONTyped(value?: UserDto | null, ignoreDiscriminator: 
         'username': value['username'],
         'email': value['email'],
         'roles': value['roles'] == null ? undefined : Array.from(value['roles'] as Set<any>),
+        'companyDto': CompanyDtoToJSON(value['companyDto']),
+        'lastActive': value['lastActive'] == null ? value['lastActive'] : value['lastActive'].toISOString().substring(0,10),
+        'profileImageUrl': value['profileImageUrl'],
     };
 }
 
