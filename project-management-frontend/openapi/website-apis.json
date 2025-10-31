@@ -505,6 +505,77 @@
         }
       }
     },
+    "/api/auth/change-password": {
+      "post": {
+        "tags": [
+          "auth-controller"
+        ],
+        "operationId": "changePassword",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/users/upload": {
+      "post": {
+        "tags": [
+          "admin-controller"
+        ],
+        "operationId": "uploadUserCSV",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "required": [
+                  "file"
+                ],
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/users/{id}": {
       "get": {
         "tags": [
@@ -821,6 +892,37 @@
         }
       }
     },
+    "/api/ai/elaborate/{taskId}": {
+      "get": {
+        "tags": [
+          "ai-controller"
+        ],
+        "operationId": "elaborateTask",
+        "parameters": [
+          {
+            "name": "taskId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/AiElaborationResponseDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/admin/analytics/summary": {
       "get": {
         "tags": [
@@ -964,63 +1066,6 @@
           }
         }
       },
-      "TaskDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "title": {
-            "type": "string"
-          },
-          "description": {
-            "type": "string"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "dueDate": {
-            "type": "string",
-            "format": "date"
-          },
-          "status": {
-            "type": "string",
-            "enum": [
-              "TO_DO",
-              "IN_PROGRESS",
-              "REVIEW",
-              "DONE"
-            ]
-          },
-          "priority": {
-            "type": "string",
-            "enum": [
-              "LOW",
-              "MEDIUM",
-              "HIGH",
-              "CRITICAL"
-            ]
-          },
-          "projectId": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "assigneeId": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "creatorId": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "companyId": {
-            "type": "integer",
-            "format": "int64"
-          }
-        }
-      },
       "ProjectDto": {
         "type": "object",
         "properties": {
@@ -1070,6 +1115,62 @@
             }
           },
           "taskCount": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "companyId": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "TaskDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "dueDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "TO_DO",
+              "IN_PROGRESS",
+              "REVIEW",
+              "DONE"
+            ]
+          },
+          "priority": {
+            "type": "string",
+            "enum": [
+              "LOW",
+              "MEDIUM",
+              "HIGH",
+              "CRITICAL"
+            ]
+          },
+          "project": {
+            "$ref": "#/components/schemas/ProjectDto"
+          },
+          "assigneeId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "creatorId": {
             "type": "integer",
             "format": "int64"
           },
@@ -1212,6 +1313,20 @@
           },
           "joinCode": {
             "type": "string"
+          }
+        }
+      },
+      "AiElaborationResponseDto": {
+        "type": "object",
+        "properties": {
+          "elaboratedTask": {
+            "type": "string"
+          },
+          "steps": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         }
       },

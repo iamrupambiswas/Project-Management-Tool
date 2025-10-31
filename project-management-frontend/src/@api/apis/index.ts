@@ -1,6 +1,7 @@
 /* tslint:disable */
 /* eslint-disable */
 export * from './admin-controller-api';
+export * from './ai-controller-api';
 export * from './auth-controller-api';
 export * from './company-controller-api';
 export * from './project-controller-api';

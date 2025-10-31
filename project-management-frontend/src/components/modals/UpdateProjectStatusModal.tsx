@@ -2,15 +2,16 @@ import { useState } from "react";
 import { X, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
-import { ProjectDtoStatusEnum } from "../../@api/models"; 
+import { ProjectDtoStatusEnum } from "../../@api/models";
+import { updateProjectStatus } from "../../services/projectService"; // ✅ import your real API
 
 const statusOptions: string[] = Object.values(ProjectDtoStatusEnum);
 
 interface UpdateProjectStatusProps {
   projectId: number;
-  currentStatus: ProjectDtoStatusEnum | string; 
+  currentStatus: ProjectDtoStatusEnum | string;
   onClose: () => void;
-  onStatusUpdated: (newStatus: ProjectDtoStatusEnum) => void; 
+  onStatusUpdated: (newStatus: ProjectDtoStatusEnum) => void;
 }
 
 export default function UpdateProjectStatusModal({
@@ -19,33 +20,31 @@ export default function UpdateProjectStatusModal({
   onClose,
   onStatusUpdated,
 }: UpdateProjectStatusProps) {
-  
   const [newStatus, setNewStatus] = useState<ProjectDtoStatusEnum | string>(currentStatus);
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    
-    // 1. Call your API service to update the project status
-    // Ensure the newStatus is explicitly cast to the required DTO enum type if needed
-    // try {
-    //   await updateProjectStatus(projectId, newStatus as ProjectDtoStatusEnum); 
-    //   toast.success(`Project status updated to ${newStatus.replace('_', ' ')}!`);
-    //   onStatusUpdated(newStatus as ProjectDtoStatusEnum);
-    // } catch (error) {
-    //   toast.error("Failed to update status.");
-    //   console.error(error);
-    // } finally {
-    //   setLoading(false);
-    // }
+    if (newStatus === currentStatus) {
+      toast("No changes detected");
+      return;
+    }
 
-    // --- Placeholder API simulation ---
-    await new Promise(resolve => setTimeout(resolve, 800)); 
-    toast.success(`Project status updated to ${newStatus.replace('_', ' ')}!`);
-    onStatusUpdated(newStatus as ProjectDtoStatusEnum);
-    setLoading(false);
-    // --- End Placeholder ---
+    setLoading(true);
+
+    try {
+      // ✅ Call the actual API
+      await updateProjectStatus(projectId, newStatus as ProjectDtoStatusEnum);
+
+      toast.success(`Project status updated to ${newStatus.replace("_", " ")}!`);
+      onStatusUpdated(newStatus as ProjectDtoStatusEnum);
+      onClose();
+    } catch (err) {
+      console.error("Error updating project status:", err);
+      toast.error("Failed to update project status.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -65,7 +64,9 @@ export default function UpdateProjectStatusModal({
         <X size={20} />
       </button>
 
-      <h3 className="text-lg font-semibold border-b border-background-dark pb-2">Update Project Status</h3>
+      <h3 className="text-lg font-semibold border-b border-background-dark pb-2">
+        Update Project Status
+      </h3>
 
       <div className="flex flex-col gap-2">
         <label htmlFor="status-select" className="text-sm font-medium text-text-muted">
@@ -74,14 +75,13 @@ export default function UpdateProjectStatusModal({
         <select
           id="status-select"
           value={newStatus}
-          onChange={(e) => setNewStatus(e.target.value as ProjectDtoStatusEnum)} // Cast on change
+          onChange={(e) => setNewStatus(e.target.value as ProjectDtoStatusEnum)}
           className="border p-2 rounded-md text-text-base bg-background-dark focus:border-accent-blue outline-none"
           disabled={loading}
         >
-          {/* Map over the dynamically generated array from the DTO enum */}
           {statusOptions.map((status) => (
             <option key={status} value={status}>
-              {status.replace('_', ' ')}
+              {status.replace("_", " ")}
             </option>
           ))}
         </select>

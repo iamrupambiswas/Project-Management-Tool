@@ -16,16 +16,23 @@
 import * as runtime from '../runtime';
 import type {
   AdminAnalyticsDto,
+  UploadUserCSVRequest,
 } from '../models/index';
 import {
     AdminAnalyticsDtoFromJSON,
     AdminAnalyticsDtoToJSON,
+    UploadUserCSVRequestFromJSON,
+    UploadUserCSVRequestToJSON,
 } from '../models/index';
 
 export interface GetAnalyticsSummaryRequest {
     companyId: number;
     dateFrom?: string;
     dateTo?: string;
+}
+
+export interface UploadUserCSVOperationRequest {
+    uploadUserCSVRequest?: UploadUserCSVRequest;
 }
 
 /**
@@ -84,6 +91,48 @@ export class AdminControllerApi extends runtime.BaseAPI {
      */
     async getAnalyticsSummary(requestParameters: GetAnalyticsSummaryRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AdminAnalyticsDto> {
         const response = await this.getAnalyticsSummaryRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async uploadUserCSVRaw(requestParameters: UploadUserCSVOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<string>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("bearerAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+
+        let urlPath = `/api/admin/users/upload`;
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: UploadUserCSVRequestToJSON(requestParameters['uploadUserCSVRequest']),
+        }, initOverrides);
+
+        if (this.isJsonMime(response.headers.get('content-type'))) {
+            return new runtime.JSONApiResponse<string>(response);
+        } else {
+            return new runtime.TextApiResponse(response) as any;
+        }
+    }
+
+    /**
+     */
+    async uploadUserCSV(requestParameters: UploadUserCSVOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<string> {
+        const response = await this.uploadUserCSVRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

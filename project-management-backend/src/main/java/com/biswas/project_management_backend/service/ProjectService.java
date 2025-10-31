@@ -8,6 +8,7 @@ import com.biswas.project_management_backend.dto.mapper.UserDtoMapper;
 import com.biswas.project_management_backend.model.Project;
 import com.biswas.project_management_backend.model.Team;
 import com.biswas.project_management_backend.model.User;
+import com.biswas.project_management_backend.model.enm.ProjectStatus;
 import com.biswas.project_management_backend.repository.ProjectRepository;
 import com.biswas.project_management_backend.repository.TeamRepository;
 import com.biswas.project_management_backend.repository.UserRepository;
@@ -89,6 +90,16 @@ public class ProjectService {
         Project project = dtoMapper.toEntity(projectDto);
         Project updatedProject = projectRepo.save(project);
         return dtoMapper.toDto(updatedProject);
+    }
+
+    public ProjectDto updateProjectStatus(Long projectId, ProjectStatus status) {
+        Project project = projectRepo.getById(projectId);
+        project.setStatus(status);
+        projectRepo.save(project);
+
+        ProjectDto projectDto = dtoMapper.toDto(project);
+
+        return projectDto;
     }
 
     public void deleteProject(Long projectId) {

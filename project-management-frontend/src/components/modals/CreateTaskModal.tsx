@@ -2,14 +2,18 @@ import { useState } from "react";
 import { X, Loader2, Calendar, AlertTriangle, User } from "lucide-react";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
-
-// Assuming these imports are correct based on your setup
-import { TaskDto, TaskDtoStatusEnum, TaskDtoPriorityEnum } from "../../@api/models";
-import { createTask } from "../../services/taskService"; 
+import {
+  TaskDto,
+  TaskDtoStatusEnum,
+  TaskDtoPriorityEnum,
+} from "../../@api/models";
+import { createTask } from "../../services/taskService";
+import { useAuthStore } from "../../store/authStore";
 
 interface TeamMember {
-    id: number;
-    username: string;
+  id: number;
+  username: string;
+  email?: string;
 }
 
 interface CreateTaskProps {
@@ -27,71 +31,76 @@ export default function CreateTaskModal({
   onClose,
   onTaskCreated,
 }: CreateTaskProps) {
+
+  const { companyId } = useAuthStore();
   const [taskName, setTaskName] = useState("");
   const [description, setDescription] = useState("");
-  const [assignedMemberId, setAssignedMemberId] = useState("");
-  const [priority, setPriority] = useState<TaskDtoPriorityEnum>(TaskDtoPriorityEnum.Low);
-  const [dueDate, setDueDate] = useState<string>(""); 
+  const [assignedMemberId, setAssignedMemberId] = useState<string>("");
+  const [priority, setPriority] = useState<TaskDtoPriorityEnum>(
+    TaskDtoPriorityEnum.Low
+  );
+  const [dueDate, setDueDate] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // Helper to ensure memberId is a number for state comparison
-  const selectedAssigneeId = assignedMemberId ? Number(assignedMemberId) : undefined;
+  const selectedAssigneeId = assignedMemberId
+    ? Number(assignedMemberId)
+    : undefined;
 
-
+  // ----------------- SUBMIT HANDLER -----------------
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!taskName || !selectedAssigneeId) {
-        toast.error("Please enter a title and select an assignee.");
-        return;
+      toast.error("Please enter a title and select an assignee.");
+      return;
     }
 
     setLoading(true);
-    
-    // 1. Construct the TaskDto object
+
+    // Prepare data according to your backend TaskDto
     const taskData: TaskDto = {
-        title: taskName,
-        description: description || undefined,
-        projectId: projectId,
-        assigneeId: selectedAssigneeId,
-        creatorId: creatorId,
-        
-        // Default values as required:
-        status: TaskDtoStatusEnum.ToDo, // Status defaults to TO_DO
-        priority: priority,
-        dueDate: dueDate ? new Date(dueDate) : undefined,
+      title: taskName.trim(),
+      description: description?.trim() || undefined,
+      project: { id: projectId },
+      creatorId,
+      assigneeId: selectedAssigneeId,
+      status: TaskDtoStatusEnum.ToDo,
+      priority,
+      dueDate: dueDate ? new Date(dueDate) : undefined,
+      companyId: companyId ?? undefined,
+      createdAt : new Date(),
     };
 
-    // 2. Call the API service
     try {
       const newTask = await createTask(taskData);
-      
-      // OPTIONAL: Normalize dates from response if they are strings
-      const normalizedNewTask: TaskDto = {
-          ...newTask,
-          dueDate: newTask.dueDate ? new Date(newTask.dueDate) : undefined,
+
+      // Normalize date if backend returns string
+      const normalizedTask: TaskDto = {
+        ...newTask,
+        dueDate: newTask.dueDate ? new Date(newTask.dueDate) : undefined,
       };
 
-      toast.success(`Task "${normalizedNewTask.title}" created!`);
-      onTaskCreated(normalizedNewTask);
+      toast.success(`Task "${normalizedTask.title}" created successfully!`);
+      onTaskCreated(normalizedTask);
       onClose();
     } catch (error) {
-      toast.error("Failed to create task. Check console for details.");
-      console.error("Create task failed:", error);
+      console.error("Error creating task:", error);
+      toast.error("Failed to create task. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
+  // ----------------- COMPONENT RENDER -----------------
   return (
     <motion.form
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.9 }}
       onSubmit={handleSubmit}
-      className="relative flex flex-col gap-4 p-6 rounded-xl shadow-2xl w-full max-w-lg
-                 bg-background-light border border-background-dark text-text-base"
+      className="relative flex flex-col gap-4 p-6 rounded-xl shadow-2xl w-full max-w-lg bg-background-light border border-background-dark text-text-base"
     >
+      {/* Close Button */}
       <button
         type="button"
         onClick={onClose}
@@ -100,13 +109,19 @@ export default function CreateTaskModal({
         <X size={20} />
       </button>
 
+      {/* Header */}
       <h3 className="text-lg font-semibold border-b border-background-dark pb-2">
         Create New Task (Project: {projectId})
       </h3>
 
       {/* Task Title */}
       <div className="flex flex-col gap-1">
-        <label htmlFor="task-name" className="text-sm font-medium text-text-muted">Task Title</label>
+        <label
+          htmlFor="task-name"
+          className="text-sm font-medium text-text-muted"
+        >
+          Task Title
+        </label>
         <input
           id="task-name"
           type="text"
@@ -119,9 +134,14 @@ export default function CreateTaskModal({
         />
       </div>
 
-      {/* Description (Optional) */}
+      {/* Description */}
       <div className="flex flex-col gap-1">
-        <label htmlFor="task-description" className="text-sm font-medium text-text-muted">Description (Optional)</label>
+        <label
+          htmlFor="task-description"
+          className="text-sm font-medium text-text-muted"
+        >
+          Description (Optional)
+        </label>
         <textarea
           id="task-description"
           value={description}
@@ -133,64 +153,89 @@ export default function CreateTaskModal({
         />
       </div>
 
+      {/* Assignee, Priority, Due Date */}
       <div className="grid grid-cols-2 gap-4">
         {/* Assign Member */}
         <div className="flex flex-col gap-1">
-          <label htmlFor="assign-member" className="text-sm font-medium text-text-muted flex items-center gap-1">
+          <label
+            htmlFor="assign-member"
+            className="text-sm font-medium text-text-muted flex items-center gap-1"
+          >
             <User size={14} /> Assign To
           </label>
           <select
-            id="assign-member"
-            value={assignedMemberId}
-            onChange={(e) => setAssignedMemberId(e.target.value)}
-            className="border p-2 rounded-md text-text-base bg-background-dark focus:border-accent-blue outline-none"
-            disabled={loading}
-            required
-          >
-            <option value="" disabled>Select a member</option>
-            {teamMembers.map((member) => (
-              <option key={member.id} value={member.id}>
-                {member.username}
-              </option>
-            ))}
-          </select>
+  id="assign-member"
+  value={assignedMemberId}
+  onChange={(e) => setAssignedMemberId(e.target.value)}
+  className="border p-2 rounded-md text-text-base bg-background-dark focus:border-accent-blue outline-none"
+  disabled={loading}
+  required
+>
+  <option value="" disabled>
+    Select a member
+  </option>
+  {teamMembers.map((member, index) => {
+    if (typeof member === "string") {
+      return (
+        <option key={index} value={index}>
+          {member}
+        </option>
+      );
+    } else {
+      return (
+        <option key={member.id} value={member.id}>
+          {member.username || member.email || `User ${member.id}`}
+        </option>
+      );
+    }
+  })}
+</select>
+
         </div>
 
         {/* Priority */}
         <div className="flex flex-col gap-1">
-          <label htmlFor="priority" className="text-sm font-medium text-text-muted flex items-center gap-1">
+          <label
+            htmlFor="priority"
+            className="text-sm font-medium text-text-muted flex items-center gap-1"
+          >
             <AlertTriangle size={14} /> Priority
           </label>
           <select
             id="priority"
             value={priority}
-            onChange={(e) => setPriority(e.target.value as TaskDtoPriorityEnum)}
+            onChange={(e) =>
+              setPriority(e.target.value as TaskDtoPriorityEnum)
+            }
             className="border p-2 rounded-md text-text-base bg-background-dark focus:border-accent-blue outline-none"
             disabled={loading}
           >
-            {/* Map over the enum keys or use specific options */}
             <option value={TaskDtoPriorityEnum.Low}>Low</option>
             <option value={TaskDtoPriorityEnum.Medium}>Medium</option>
             <option value={TaskDtoPriorityEnum.High}>High</option>
           </select>
         </div>
-        
+
         {/* Due Date */}
         <div className="flex flex-col gap-1 col-span-2">
-            <label htmlFor="due-date" className="text-sm font-medium text-text-muted flex items-center gap-1">
-                <Calendar size={14} /> Due Date (Optional)
-            </label>
-            <input
-                id="due-date"
-                type="date"
-                value={dueDate}
-                onChange={(e) => setDueDate(e.target.value)}
-                className="w-full p-2 border rounded-md bg-background-dark text-text-base focus:border-accent-blue outline-none"
-                disabled={loading}
-            />
+          <label
+            htmlFor="due-date"
+            className="text-sm font-medium text-text-muted flex items-center gap-1"
+          >
+            <Calendar size={14} /> Due Date (Optional)
+          </label>
+          <input
+            id="due-date"
+            type="date"
+            value={dueDate}
+            onChange={(e) => setDueDate(e.target.value)}
+            className="w-full p-2 border rounded-md bg-background-dark text-text-base focus:border-accent-blue outline-none"
+            disabled={loading}
+          />
         </div>
       </div>
 
+      {/* Submit Button */}
       <motion.button
         type="submit"
         disabled={loading || !taskName || !selectedAssigneeId}

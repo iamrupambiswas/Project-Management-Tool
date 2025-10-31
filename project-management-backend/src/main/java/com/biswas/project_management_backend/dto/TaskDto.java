@@ -22,7 +22,7 @@ public class TaskDto {
     private LocalDate dueDate;
     private TaskStatus status;
     private TaskPriority priority;
-    private Long projectId;      // Project this task belongs to
+    private ProjectDto project;
     private Long assigneeId;     // User assigned to this task
     private Long creatorId;      // User who created the task
     private Long companyId;      // Optional company ID if needed
