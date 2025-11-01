@@ -66,160 +66,203 @@ Choose one of the two paths below.
 ## Quick Start (Docker Compose)
 
 The root `docker-compose.yml` defines three services:
+# Project Management Tool
 
-- **postgres**: `postgres:latest`, exposed on host `5434` → container `5432`
-- **backend**: Spring Boot, exposed on `8080`
-- **frontend**: Vite dev server, exposed on `5173`
+A simple, full-stack project management application you can run locally or in Docker. The app helps manage projects, teams and tasks. This README explains how to run it, how to develop on it, and how to contribute — in plain language.
 
-Commands:
+Summary:
 
-```bash
-# From repository root
+- Frontend: React + TypeScript (Vite)
+- Backend: Spring Boot (Java 21) with REST APIs
+- Database: PostgreSQL
+- Quick start: Docker Compose (one command)
+
+---
+
+## Quick facts
+
+- Backend: Spring Boot 3.5.x targeting Java 21
+- Frontend: React + TypeScript, Vite
+- Database: PostgreSQL (Dockerized by default)
+- Local dev: Docker Compose (recommended) or native installs
+
+## Prerequisites
+
+Choose how you want to run the project:
+
+- Docker (recommended): Install Docker Desktop.
+- Native (no Docker):
+  - Backend: JDK 21 (install a Java 21 JDK) and Maven 3.9+
+  - Frontend: Node.js 18+ and npm/yarn/pnpm
+
+Important: The backend targets Java 21. If you build or run the backend locally, make sure `JAVA_HOME` points to a Java 21 JDK.
+
+---
+
+## Quick start (recommended — Docker Compose)
+
+This is the easiest way to run everything together. From the repository root:
+
+PowerShell (Windows):
+
+```powershell
+# Build and start frontend, backend and database
 docker compose up --build
 
 # Stop and remove containers
 docker compose down
 ```
 
-Once up:
+Open in your browser:
 
 - Frontend: http://localhost:5173
-- Backend: http://localhost:8080
-- Postgres: host=localhost port=5434 db=project_management_db user=postgres password=root
-- OpenAPI UI (typical): http://localhost:8080/swagger-ui.html (or `/swagger-ui/index.html`)
+- Backend (API): http://localhost:8080
+- API docs (Swagger/OpenAPI): http://localhost:8080/swagger-ui.html
 
-Data is persisted in the named Docker volume `pgdata`.
+By default the Postgres container uses port 5434 on the host. The DB name, user and password used by compose are:
 
-## Local Development (without Docker)
+- DB: `project_management_db`
+- User: `postgres`
+- Password: `root`
 
-1. **Database**
+Data is stored in a Docker volume so it survives container restarts.
 
-- Start PostgreSQL locally and create a database:
-  - DB name: `project_management_db`
-  - User: `postgres`
-  - Password: `root`
-  - Port: `5432` (default) or update your backend config accordingly.
+---
 
-2. **Backend** (`project-management-backend/`)
+## Current project snapshot (auto-detected)
 
-```bash
-# In project-management-backend/
-mvn spring-boot:run
-# or build a jar
-mvn clean package
-java -jar target/project-management-backend-0.0.1-SNAPSHOT.jar
+Here are key versions and settings found in the code right now. These help you pick the right local setup.
+
+- Spring Boot (parent): 3.5.5
+- Backend `pom.xml` property `java.version`: 17
+- Backend `Dockerfile` (build image): `maven:3.9.6-eclipse-temurin-21` (builds with Java 21)
+- Backend `Dockerfile` (runtime image): `openjdk:21-slim` (Java 21 runtime)
+
+Note: the `pom.xml` currently targets Java 17 while the Docker images use Java 21. That is fine for Docker builds (the image uses JDK 21), but if you run the backend locally without Docker you should either:
+
+1. Install JDK 21 and set `JAVA_HOME` to Java 21 (recommended), or
+2. Edit `project-management-backend/pom.xml` to change `<java.version>` to `21` and configure the Maven compiler plugin to use `<release>21`.
+
+If you'd like, I can make that `pom.xml` change for you so the project consistently targets Java 21 across local builds and Docker.
+
+---
+
+---
+
+## Run the backend locally (no Docker)
+
+Use these steps when you want to run only the backend on your machine.
+
+1) Install Java 21 and set `JAVA_HOME`.
+
+PowerShell example (change the path to where you installed Java 21):
+
+```powershell
+$env:JAVA_HOME = 'C:\Program Files\Eclipse Adoptium\jdk-21'
+$env:PATH = "$env:JAVA_HOME\bin;" + $env:PATH
 ```
 
-- Runs on http://localhost:8080 by default.
-- Uses Spring Boot 3 with JPA, Flyway, Security (JWT).
+2) Build and run:
 
-3. **Frontend** (`project-management-frontend/`)
+```powershell
+cd project-management-backend
+& '.\mvnw.cmd' -DskipTests package
+java -jar target/project-management-backend.jar
+```
 
-```bash
-# In project-management-frontend/
+If the Maven wrapper fails (common on Windows when paths contain spaces), either:
+
+- Install Maven and run `mvn -DskipTests package` instead of the wrapper, or
+- Install your JDK in a path without spaces (e.g., `C:\jdk\jdk-21`) and set `JAVA_HOME` accordingly.
+
+The backend listens on port 8080 by default.
+
+---
+
+## Run the frontend locally
+
+```powershell
+cd project-management-frontend
 npm install
 npm run dev
-# build/preview
-npm run build
-npm run preview
 ```
 
-- Vite dev server runs at http://localhost:5173 (host exposed via `vite --host`).
-- Ensure API base URL points to the backend (e.g., `http://localhost:8080`).
+The frontend runs on http://localhost:5173 in development. Make sure the frontend's API URL points to the backend (`http://localhost:8080`) when running both locally.
 
-## AI Integration (Spring AI)
+---
 
-Implemented using **Spring AI** + **OpenAI GPT-5-Nano**, enabling:
+## Environment variables (examples)
 
-- **Context-aware task elaboration**  
-- **Project-based summaries**  
-- **Expandable structure** for AI insights & analytics  
-
-#### Environment Variables
+Backend configuration is read from Spring profiles or environment variables. Example values you can use for development:
 
 ```env
+SPRING_PROFILES_ACTIVE=docker
+SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/project_management_db
+SPRING_DATASOURCE_USERNAME=postgres
+SPRING_DATASOURCE_PASSWORD=root
+
+# Optional (for AI features)
 SPRING_AI_OPENAI_API_KEY=<your-api-key>
 SPRING_AI_OPENAI_CHAT_MODEL=gpt-5-nano
 ```
 
-## CSV Upload Feature
+Check `project-management-backend/src/main/resources/` for profile-specific configuration (files like `application-docker.yml`).
 
-Admins can upload **`.csv` files** with the following headers:
+---
 
-```csv
-name,email,role
-```
-The system parses and automatically adds employees to the database.
+## Docker images used
 
-## CI/CD (GitHub Actions)
+- Build: `maven:3.9.6-eclipse-temurin-21` (builds with Java 21)
+- Runtime: `openjdk:21-slim`
 
-The project uses **GitHub Actions** for automated deployment:
+The Dockerfiles in this repo already use Java 21.
 
-- **Backend** → Deployed to **Render**  
-- **Frontend** → Deployed to **Vercel**  
-- **Triggered** on **every push to `main`**
+---
 
-#### Workflow Summary
+## CI / Deployment
 
-| Service  | Platform | Trigger       |
-|--------|----------|---------------|
-| Backend  | Render   | `push` to `main` |
-| Frontend | Vercel   | `push` to `main` |
+CI is set up to build and deploy the frontend and backend from `main` (GitHub Actions). If you upgrade Java or other major dependencies, make sure CI uses Java 21 in the build steps.
 
+---
 
-## Environment Configuration
+## Developer notes & testing
 
-The Docker Compose file sets sensible defaults:
+- Run backend tests: `mvn test` (or use the wrapper: `.
+\mvnw.cmd test` on Windows).
+- Frontend tests and lint scripts are available in `project-management-frontend/package.json`.
 
-- Postgres environment (`docker-compose.yml`):
-  - `POSTGRES_USER=postgres`
-  - `POSTGRES_PASSWORD=root`
-  - `POSTGRES_DB=project_management_db`
+Tip: If you see compilation errors after switching to Java 21, confirm `JAVA_HOME` points at Java 21 and your build uses `<release>21` in the Maven Compiler plugin (the backend already has this configured).
 
-Backend typically needs (examples):
+---
 
-- `SPRING_PROFILES_ACTIVE=docker` (already set in Compose)
-- Database connection properties per profile (e.g., `application-docker.yml` / `application.properties`).
+## Contributing
 
-If you maintain separate profiles, ensure the active profile has the right JDBC URL pointing to the Docker service name `postgres` when running with Compose, and to `localhost` when running natively.
+We love contributions! Short, friendly steps:
 
-## Features / Modules
+1. Open an issue explaining what you'd like to change.
+2. Create a small branch from `main` (name it `fix/...` or `feature/...`).
+3. Make your change, run tests locally, and keep the change focused.
+4. Open a pull request and link the issue.
 
-Based on controllers under `project-management-backend/src/main/java/com/biswas/project_management_backend/controller/`:
+Formatting and tests:
 
-- **Auth**: Authentication endpoints using JWT.
-- **Users**: User CRUD and profile actions.
-- **Projects**: Project CRUD and related operations.
-- **Teams**: Team CRUD and membership management.
+- Frontend: ESLint + Prettier (see `project-management-frontend`)
+- Backend: follow existing patterns; add tests for new behavior where possible
 
-Additional backend capabilities:
+If you're new to the project, leave a short comment on an issue saying you'd like to work on it — someone will help you get started.
 
-- **Validation**: Request validation using Spring Validation.
-- **Migrations**: Managed by Flyway on startup.
-- **Observability**: Spring Boot Actuator endpoints (where enabled).
+---
 
-## Example Usage
+## License
 
-- Visit the frontend at `http://localhost:5173` to use the UI.
-- Explore API docs at `http://localhost:8080/swagger-ui.html` for request/response schemas.
-- Use credentials created via signup/auth endpoints (implementation dependent) to authenticate in the app.
+See the `LICENSE` file in the repository root.
 
-## 👥 Contributors
+---
 
-Thanks to these amazing people for their contributions 💪
+Next steps I can help with (pick any):
 
-| Contributor | Contribution |
-|-------------|---------------|
-| <a href="https://github.com/AbhishekPoojary"><img src="https://avatars.githubusercontent.com/AbhishekPoojary" width="60" height="60" style="border-radius:50%" /></a><br>[@Abhishek S Poojary](https://github.com/AbhishekPoojary) | Improved README.md |
-| <a href="https://github.com/chathumsp02"><img src="https://avatars.githubusercontent.com/chathumsp02" width="60" height="60" style="border-radius:50%" /></a><br>[@chathum_sp](https://github.com/chathumsp02) | 1. Redesigned the Login and Register pages with a modern split-screen layout, animated visuals, and improved accessibility for a polished user experience.<br><br>2. Designed the 404 page. |
+- Add `CONTRIBUTING.md` and `DEVELOPER.md` with step-by-step setup.
+- Update CI workflows to explicitly use Java 21.
+- Add a short Troubleshooting section with common Windows Maven wrapper fixes.
 
-
-## Contribution
-
-Contributions are welcome! To work on this:
-
-- **Discuss first**: Open an issue or comment/assign yourself before starting.
-- **Branching**: Create feature branches from `main`.
-- **Code style**: Follow existing patterns. Frontend uses ESLint/Prettier; run `npm run lint`.
-- **Commits/PRs**: Keep changes focused, include screenshots for UI changes.
-- **Testing**: Add or update tests where applicable.
+Tell me which one you want and I'll create it.
