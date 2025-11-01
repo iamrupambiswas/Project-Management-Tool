@@ -58,8 +58,8 @@ public class AnalyticsService {
     }
 
 
-    public UserAnalyticsDto getUserAnalytics(String username, Long companyId) {
-        User user = userRepository.findByUsernameAndCompanyId(username, companyId);
+    public UserAnalyticsDto getUserAnalytics(String userEmail, Long companyId) {
+        User user = userRepository.findByEmailAndCompanyId(userEmail, companyId);
 //                .orElseThrow(() -> new RuntimeException("User not found"));
 
         Long assignedTasks = taskRepository.countByAssignee(user);

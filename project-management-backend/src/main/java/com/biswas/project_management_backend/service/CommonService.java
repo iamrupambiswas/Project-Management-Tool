@@ -29,8 +29,8 @@ public class CommonService {
             throw new RuntimeException("File cannot be empty");
         }
 
-        String username = authentication.getName();
-        User user = userRepository.findByUsername(username)
+        String userEmail = authentication.getName();
+        User user = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         try {
@@ -62,7 +62,7 @@ public class CommonService {
     @Transactional
     public void deleteProfileImage(Authentication authentication) {
         String email = authentication.getName();
-        User user = userRepository.findByUsername(email)
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         Image existingImage = user.getProfileImage();

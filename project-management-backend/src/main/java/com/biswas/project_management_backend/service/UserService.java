@@ -35,18 +35,15 @@ public class UserService {
     // ---------------- AUTH ----------------
     public AuthResponseDto registerCompanyWithAdmin(RegisterCompanyRequestDto request) {
 
-        // 1. Create company
         Company company = Company.builder()
                 .name(request.getCompanyName())
                 .domain(request.getDomain())
                 .build();
         Company savedCompany = companyRepository.save(company);
 
-        // 2. Assign admin role
         Role adminRole = roleRepository.findByName("ADMIN")
                 .orElseThrow(() -> new RuntimeException("Default role ADMIN not found"));
 
-        // 3. Create admin user
         User admin = User.builder()
                 .username(request.getAdmin().getName())
                 .email(request.getAdmin().getEmail())
@@ -56,10 +53,9 @@ public class UserService {
                 .build();
         User savedAdmin = userRepository.save(admin);
 
-        // 4. Generate JWT with companyId in payload
         Map<String, Object> claims = new HashMap<>();
         claims.put("companyId", savedCompany.getId());
-        String token = jwtUtil.generateToken(savedAdmin.getUsername(), claims);
+        String token = jwtUtil.generateToken(savedAdmin.getEmail(), claims);
 
         UserDto userDto = userDtoMapper.toDto(savedAdmin);
 
@@ -69,18 +65,15 @@ public class UserService {
 
     public AuthResponseDto registerUserWithJoinCode(RegisterRequestDto request) {
 
-        // 1️⃣ Assign default USER role
         Role userRole = roleRepository.findByName("USER")
                 .orElseThrow(() -> new RuntimeException("Default role USER not found"));
 
-        // 2️⃣ If joinCode provided, fetch company
         Company company = null;
         if (request.getJoinCode() != null && !request.getJoinCode().isEmpty()) {
             company = companyRepository.findByJoinCode(request.getJoinCode())
                     .orElseThrow(() -> new RuntimeException("Invalid join code"));
         }
 
-        // 3️⃣ Create user
         User user = User.builder()
                 .username(request.getUsername())
                 .email(request.getEmail())
@@ -91,10 +84,9 @@ public class UserService {
 
         User savedUser = userRepository.save(user);
 
-        // 4️⃣ Generate JWT with companyId if available
         Map<String, Object> claims = new HashMap<>();
         if (company != null) claims.put("companyId", company.getId());
-        String token = jwtUtil.generateToken(savedUser.getUsername(), claims);
+        String token = jwtUtil.generateToken(savedUser.getEmail(), claims);
 
         UserDto userDto = userDtoMapper.toDto(savedUser);
 
@@ -106,12 +98,12 @@ public class UserService {
     public AuthResponseDto login(LoginRequestDto authRequest) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        authRequest.getUsername(),
+                        authRequest.getEmail(),
                         authRequest.getPassword()
                 )
         );
 
-        User user = userRepository.findByUsername(authRequest.getUsername())
+        User user = userRepository.findByEmail(authRequest.getEmail())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         user.setLastActiveDate(LocalDate.now());
@@ -122,7 +114,7 @@ public class UserService {
             claims.put("companyId", user.getCompany().getId());
         }
 
-        String token = jwtUtil.generateToken(authRequest.getUsername(), claims);
+        String token = jwtUtil.generateToken(authRequest.getEmail(), claims);
         UserDto userDto = userDtoMapper.toDto(user);
 
         return new AuthResponseDto(token, userDto);
