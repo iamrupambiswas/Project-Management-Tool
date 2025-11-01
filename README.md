@@ -264,5 +264,3 @@ Next steps I can help with (pick any):
 - Add `CONTRIBUTING.md` and `DEVELOPER.md` with step-by-step setup.
 - Update CI workflows to explicitly use Java 21.
 - Add a short Troubleshooting section with common Windows Maven wrapper fixes.
-
-Tell me which one you want and I'll create it.
