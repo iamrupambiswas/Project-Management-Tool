@@ -11,6 +11,7 @@ import {
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ComponentType, useState, useRef, useEffect } from "react";
 import { useAuthStore } from "../store/authStore";
+import { useNotificationStore } from "../store/notificationStore";
 
 type LucideIcon = ComponentType<{ size: number; className?: string }>;
 
@@ -29,19 +30,34 @@ const routeMaps: { path: RegExp; title: string; Icon: LucideIcon }[] = [
 
 export default function Topbar() {
   const location = useLocation();
+  const navigate = useNavigate();
+  const logout = useAuthStore((s) => s.logout);
+
+  const [profileOpen, setProfileOpen] = useState(false);
+  const [notifOpen, setNotifOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const { notifications, fetchNotifications, markAsRead, markAllAsRead } = useNotificationStore();
+  const { user, token } = useAuthStore();
+  const unreadCount = notifications.filter((n) => !n.read).length;
+
   const currentPath = location.pathname;
   const activeRoute = routeMaps.find((map) => map.path.test(currentPath));
   const title = activeRoute?.title || "Page";
   const PageIcon = activeRoute?.Icon || LayoutDashboard;
-  const navigate = useNavigate();
-  const [open, setOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-  const logout = useAuthStore((s) => s.logout);
 
+  useEffect(() => {
+    if (user?.id && token) {
+      fetchNotifications(token);
+    }
+  }, [token, fetchNotifications]);
+
+  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
-        setOpen(false);
+        setProfileOpen(false);
+        setNotifOpen(false);
       }
     };
     document.addEventListener("click", handleClickOutside);
@@ -49,23 +65,78 @@ export default function Topbar() {
   }, []);
 
   return (
-    <header className="h-14 md:h-16 bg-background-light text-text-base font-sans shadow-md flex items-center justify-between px-4 md:px-6 border-b border-background-dark">
+    <header className="h-14 md:h-16 bg-background-light text-text-base shadow-md flex items-center justify-between px-4 md:px-6 border-b border-background-dark">
+      {/* Left side: Page title */}
       <div className="flex items-center gap-3">
         <PageIcon size={24} className="text-accent-blue" />
         <h1 className="text-xl md:text-2xl font-bold text-accent-blue">{title}</h1>
       </div>
 
-      <div className="flex items-center gap-4 md:gap-6">
-        {/* Notifications */}
+      {/* Right side: Notifications + Profile */}
+      <div className="flex items-center gap-4 md:gap-6" ref={dropdownRef}>
+        {/* 🔔 Notifications */}
         <div className="relative">
-          <Bell className="w-5 h-5 md:w-6 md:h-6 text-text-muted cursor-pointer hover:text-accent-blue transition-colors duration-200" />
-          <span className="absolute -top-1 right-0 block h-2 w-2 rounded-full ring-2 ring-background-light bg-error-red"></span>
+          <button
+            onClick={() => setNotifOpen((prev) => !prev)}
+            className="relative focus:outline-none"
+          >
+            <Bell className="w-6 h-6 text-text-muted cursor-pointer hover:text-accent-blue transition-colors duration-200" />
+            {unreadCount > 0 && (
+              <span className="absolute -top-1 -right-1 flex items-center justify-center h-4 w-4 rounded-full bg-error-red text-white text-[10px] font-bold">
+                {unreadCount}
+              </span>
+            )}
+          </button>
+
+          {notifOpen && (
+            <div className="absolute right-0 mt-3 w-80 bg-background-light border border-background-dark rounded-xl shadow-lg z-50 animate-fadeIn max-h-96 overflow-y-auto">
+              <div className="flex justify-between items-center p-3 border-b border-gray-200">
+                <h3 className="text-sm font-semibold">Notifications</h3>
+
+                {/* ✅ Show Clear All only if there are notifications */}
+                {notifications.length > 0 && (
+                  <button
+                    onClick={async () => {
+                      await markAllAsRead(user?.id!, token!);
+                      setNotifOpen(false); // ✅ Close dropdown after clearing
+                    }}
+                    className="text-xs text-accent-blue hover:underline"
+                  >
+                    Clear All
+                  </button>
+                )}
+              </div>
+
+              {notifications.length === 0 ? (
+                <div className="p-4 text-sm text-text-muted text-center">
+                  No new notifications 🎉
+                </div>
+              ) : (
+                <ul className="divide-y divide-gray-200">
+                  {notifications.map((n) => (
+                    <li
+                      key={n.id}
+                      onClick={async () => {
+                        await markAsRead(n.id, token!);
+                      }}
+                      className={`p-3 cursor-pointer hover:bg-gray-100 transition-colors ${
+                        !n.read ? "font-semibold" : "text-gray-500"
+                      }`}
+                    >
+                      <p className="text-sm">{n.message}</p>
+                      <p className="text-xs text-text-muted">{n.createdAt}</p>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          )}
         </div>
 
-        {/* Profile Dropdown */}
-        <div className="relative" ref={dropdownRef}>
+        {/* 👤 Profile Dropdown */}
+        <div className="relative">
           <button
-            onClick={() => setOpen((prev) => !prev)}
+            onClick={() => setProfileOpen((prev) => !prev)}
             className="focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-blue rounded-full"
           >
             <img
@@ -87,25 +158,19 @@ export default function Topbar() {
             />
           </button>
 
-          {open && (
-            <div
-              className="absolute right-0 mt-3 w-44 bg-background-light 
-              border border-background-dark rounded-xl shadow-lg py-2 z-50 animate-fadeIn
-              transition-all duration-200"
-            >
+          {profileOpen && (
+            <div className="absolute right-0 mt-3 w-44 bg-background-light border border-background-dark rounded-xl shadow-lg py-2 z-50 animate-fadeIn">
               <Link
                 to="/profile"
-                onClick={() => setOpen(false)}
-                className="flex items-center gap-2 px-4 py-2 text-sm text-text-base 
-                hover:bg-accent-blue hover:text-white transition-colors rounded-md mx-2"
+                onClick={() => setProfileOpen(false)}
+                className="flex items-center gap-2 px-4 py-2 text-sm hover:bg-accent-blue hover:text-white rounded-md mx-2"
               >
                 <User size={16} /> Profile
               </Link>
               <Link
                 to="/settings"
-                onClick={() => setOpen(false)}
-                className="flex items-center gap-2 px-4 py-2 text-sm text-text-base 
-                hover:bg-accent-blue hover:text-white transition-colors rounded-md mx-2"
+                onClick={() => setProfileOpen(false)}
+                className="flex items-center gap-2 px-4 py-2 text-sm hover:bg-accent-blue hover:text-white rounded-md mx-2"
               >
                 <Settings size={16} /> Settings
               </Link>
@@ -114,8 +179,7 @@ export default function Topbar() {
                   logout();
                   navigate("/login");
                 }}
-                className="flex items-center gap-2 w-full px-4 py-2 text-sm text-text-base 
-                hover:bg-error-red hover:text-white transition-colors rounded-md mx-2"
+                className="flex items-center gap-2 w-full px-4 py-2 text-sm hover:bg-error-red hover:text-white rounded-md mx-2"
               >
                 <LogOut size={16} /> Logout
               </button>

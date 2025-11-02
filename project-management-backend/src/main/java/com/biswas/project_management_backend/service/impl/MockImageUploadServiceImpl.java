@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.util.UUID;
 
 @Service
-@Profile("prod")
+@Profile({"prod", "docker"})
 public class MockImageUploadServiceImpl implements ImageUploadService {
 
     @Autowired

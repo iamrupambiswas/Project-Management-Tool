@@ -31,7 +31,6 @@ export default function CreateTaskModal({
   onClose,
   onTaskCreated,
 }: CreateTaskProps) {
-
   const { companyId } = useAuthStore();
   const [taskName, setTaskName] = useState("");
   const [description, setDescription] = useState("");
@@ -46,18 +45,16 @@ export default function CreateTaskModal({
     ? Number(assignedMemberId)
     : undefined;
 
-  // ----------------- SUBMIT HANDLER -----------------
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!taskName || !selectedAssigneeId) {
-      toast.error("Please enter a title and select an assignee.");
+    if (!taskName.trim()) {
+      toast.error("Please enter a task title.");
       return;
     }
 
     setLoading(true);
 
-    // Prepare data according to your backend TaskDto
     const taskData: TaskDto = {
       title: taskName.trim(),
       description: description?.trim() || undefined,
@@ -68,19 +65,25 @@ export default function CreateTaskModal({
       priority,
       dueDate: dueDate ? new Date(dueDate) : undefined,
       companyId: companyId ?? undefined,
-      createdAt : new Date(),
+      createdAt: new Date(),
     };
 
     try {
       const newTask = await createTask(taskData);
 
-      // Normalize date if backend returns string
       const normalizedTask: TaskDto = {
         ...newTask,
         dueDate: newTask.dueDate ? new Date(newTask.dueDate) : undefined,
       };
 
-      toast.success(`Task "${normalizedTask.title}" created successfully!`);
+      if (selectedAssigneeId) {
+        toast.success(
+          `Task "${normalizedTask.title}" created and assigned successfully!`
+        );
+      } else {
+        toast.success(`Task "${normalizedTask.title}" created successfully!`);
+      }
+
       onTaskCreated(normalizedTask);
       onClose();
     } catch (error) {
@@ -91,7 +94,6 @@ export default function CreateTaskModal({
     }
   };
 
-  // ----------------- COMPONENT RENDER -----------------
   return (
     <motion.form
       initial={{ opacity: 0, scale: 0.9 }}
@@ -100,7 +102,6 @@ export default function CreateTaskModal({
       onSubmit={handleSubmit}
       className="relative flex flex-col gap-4 p-6 rounded-xl shadow-2xl w-full max-w-lg bg-background-light border border-background-dark text-text-base"
     >
-      {/* Close Button */}
       <button
         type="button"
         onClick={onClose}
@@ -109,12 +110,10 @@ export default function CreateTaskModal({
         <X size={20} />
       </button>
 
-      {/* Header */}
       <h3 className="text-lg font-semibold border-b border-background-dark pb-2">
         Create New Task (Project: {projectId})
       </h3>
 
-      {/* Task Title */}
       <div className="flex flex-col gap-1">
         <label
           htmlFor="task-name"
@@ -134,7 +133,6 @@ export default function CreateTaskModal({
         />
       </div>
 
-      {/* Description */}
       <div className="flex flex-col gap-1">
         <label
           htmlFor="task-description"
@@ -153,9 +151,7 @@ export default function CreateTaskModal({
         />
       </div>
 
-      {/* Assignee, Priority, Due Date */}
       <div className="grid grid-cols-2 gap-4">
-        {/* Assign Member */}
         <div className="flex flex-col gap-1">
           <label
             htmlFor="assign-member"
@@ -164,36 +160,28 @@ export default function CreateTaskModal({
             <User size={14} /> Assign To
           </label>
           <select
-  id="assign-member"
-  value={assignedMemberId}
-  onChange={(e) => setAssignedMemberId(e.target.value)}
-  className="border p-2 rounded-md text-text-base bg-background-dark focus:border-accent-blue outline-none"
-  disabled={loading}
-  required
->
-  <option value="" disabled>
-    Select a member
-  </option>
-  {teamMembers.map((member, index) => {
-    if (typeof member === "string") {
-      return (
-        <option key={index} value={index}>
-          {member}
-        </option>
-      );
-    } else {
-      return (
-        <option key={member.id} value={member.id}>
-          {member.username || member.email || `User ${member.id}`}
-        </option>
-      );
-    }
-  })}
-</select>
-
+            id="assign-member"
+            value={assignedMemberId}
+            onChange={(e) => {
+              setAssignedMemberId(e.target.value);
+            }}
+            className="border p-2 rounded-md text-text-base bg-background-dark focus:border-accent-blue outline-none"
+            disabled={loading}
+            required
+          >
+            <option value="" disabled>
+              Select a member
+            </option>
+            {teamMembers
+              .filter((member) => typeof member !== "string" && member.id)
+              .map((member) => (
+                <option key={member.id} value={String(member.id)}>
+                  {member.username || member.email || `User ${member.id}`}
+                </option>
+              ))}
+          </select>
         </div>
 
-        {/* Priority */}
         <div className="flex flex-col gap-1">
           <label
             htmlFor="priority"
@@ -216,7 +204,6 @@ export default function CreateTaskModal({
           </select>
         </div>
 
-        {/* Due Date */}
         <div className="flex flex-col gap-1 col-span-2">
           <label
             htmlFor="due-date"
@@ -235,10 +222,9 @@ export default function CreateTaskModal({
         </div>
       </div>
 
-      {/* Submit Button */}
       <motion.button
         type="submit"
-        disabled={loading || !taskName || !selectedAssigneeId}
+        disabled={loading || !taskName}
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
         className="bg-accent-green text-white py-2 rounded-md hover:bg-opacity-80 disabled:bg-gray-400 transition-colors font-semibold flex justify-center items-center gap-2 mt-2"

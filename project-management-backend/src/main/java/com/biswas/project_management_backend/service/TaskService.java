@@ -8,6 +8,7 @@ import com.biswas.project_management_backend.model.Company;
 import com.biswas.project_management_backend.model.Project;
 import com.biswas.project_management_backend.model.Task;
 import com.biswas.project_management_backend.model.User;
+import com.biswas.project_management_backend.model.enm.NotificationType;
 import com.biswas.project_management_backend.repository.CompanyRepository;
 import com.biswas.project_management_backend.repository.ProjectRepository;
 import com.biswas.project_management_backend.repository.TaskRepository;
@@ -42,20 +43,45 @@ public class TaskService {
     @Autowired
     CompanyRepository companyRepository;
 
+    @Autowired
+    NotificationService notificationService;
+
     public TaskDto createTask(TaskDto dto) {
         Task task = dtoMapper.toEntity(dto);
         Project project = projectRepository.getById(dto.getProject().getId());
         User creator = userRepository.getById(dto.getCreatorId());
-        User assignee = userRepository.getById(dto.getAssigneeId());
         Company company = companyRepository.getById(dto.getCompanyId());
 
         task.setProject(project);
         task.setCreator(creator);
-        task.setAssignee(assignee);
         task.setCompany(company);
 
+        // Save task first (required before assigning)
         Task saved = taskRepository.save(task);
+
+        // Assign task only if assigneeId is present
+        if (dto.getAssigneeId() != null) {
+            assignTask(saved.getId(), dto.getAssigneeId());
+        }
+
         return dtoMapper.toDto(saved);
+    }
+
+    public String assignTask(Long taskId, Long assigneeId) {
+        Task task = taskRepository.getById(taskId);
+        User assignee = userRepository.getById(assigneeId);
+
+        task.setAssignee(assignee);
+        taskRepository.save(task);
+
+        notificationService.createNotification(
+                assignee,
+                "You’ve been assigned a new task: " + task.getTitle(),
+                NotificationType.TASK_ASSIGNED,
+                task.getId()
+        );
+
+        return "Task '" + task.getTitle() + "' has been assigned to " + assignee.getUsername();
     }
 
     public TaskDto updateTask(Long id, TaskDto dto) {

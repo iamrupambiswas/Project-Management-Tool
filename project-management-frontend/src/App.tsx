@@ -19,10 +19,37 @@ import TaskDetails from './pages/TaskDetails';
 import TeamDetails from './pages/TeamDetails';
 import ProfilePage from './pages/Profile';
 import NotFound from "./pages/NotFound"; 
+import { useWebSocket } from "./hooks/useWebSocket";
+import { useNotificationStore } from "./store/notificationStore";
+import { useCallback, useEffect, useState } from "react";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function App() {
   const isAuthenticated = useAuthStore((state) => state.token);
+  const user = useAuthStore((state) => state.user);
   const location = useLocation();
+  const addNotification = useNotificationStore((state) => state.addNotification);
+  const [userId, setUserId] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (user?.id) {
+      setUserId(user.id);
+    } else {
+      const stored = localStorage.getItem("user");
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        setUserId(parsed.id);
+      }
+    }
+  }, [user]);
+
+  
+  const handleWebSocketMessage = useCallback((data: any) => {
+    addNotification(data);
+  }, [addNotification]);  
+
+useWebSocket(userId ?? 0, handleWebSocketMessage);
 
   const hideLayout = location.pathname === "/login" || location.pathname === "/register" || location.pathname === "/register-company";
 
@@ -111,6 +138,8 @@ function App() {
             {/* 404 Route - MUST BE LAST */}
             <Route path="*" element={<NotFound />} />
           </Routes>
+
+          <ToastContainer />
 
           <Analytics />
           
