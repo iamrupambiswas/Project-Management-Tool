@@ -19,19 +19,25 @@ import TaskDetails from './pages/TaskDetails';
 import TeamDetails from './pages/TeamDetails';
 import ProfilePage from './pages/Profile';
 import NotFound from "./pages/NotFound"; 
+import { useState } from "react";
 
 function App() {
   const isAuthenticated = useAuthStore((state) => state.token);
   const location = useLocation();
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const hideLayout = location.pathname === "/login" || location.pathname === "/register" || location.pathname === "/register-company";
 
   return (
-    <div className="flex h-screen bg-background-dark text-text-base">
-      {isAuthenticated && !hideLayout && <Sidebar />}
+    <div className="flex h-screen bg-background-dark text-text-base overflow-x-hidden">
+      {isAuthenticated && !hideLayout && (
+        <Sidebar open={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+      )}
 
       <div className="flex-1 flex flex-col overflow-hidden">
-        {isAuthenticated && !hideLayout && <Topbar />}
+        {isAuthenticated && !hideLayout && (
+          <Topbar onMenuClick={() => setIsSidebarOpen(true)} />
+        )}
 
         <main className="flex-1 overflow-y-auto scroll-smooth bg-background-content">
           <Routes>

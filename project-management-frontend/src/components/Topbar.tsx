@@ -7,9 +7,10 @@ import {
   ListChecks,
   LogOut,
   Settings,
+  Menu,
 } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { ComponentType, useState, useRef, useEffect } from "react";
+import { ComponentType, useState, useRef, useEffect, useCallback } from "react";
 import { useAuthStore } from "../store/authStore";
 
 type LucideIcon = ComponentType<{ size: number; className?: string }>;
@@ -27,7 +28,11 @@ const routeMaps: { path: RegExp; title: string; Icon: LucideIcon }[] = [
   { path: /.*/, title: "Page", Icon: LayoutDashboard },
 ];
 
-export default function Topbar() {
+type TopbarProps = {
+  onMenuClick?: () => void;
+};
+
+export default function Topbar({ onMenuClick }: TopbarProps) {
   const location = useLocation();
   const currentPath = location.pathname;
   const activeRoute = routeMaps.find((map) => map.path.test(currentPath));
@@ -35,32 +40,56 @@ export default function Topbar() {
   const PageIcon = activeRoute?.Icon || LayoutDashboard;
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
+  const [profileImageUrl, setProfileImageUrl] = useState<string>("https://ui-avatars.com/api/?name=User");
   const dropdownRef = useRef<HTMLDivElement>(null);
   const logout = useAuthStore((s) => s.logout);
+  const user = useAuthStore((s) => s.user);
+
+  const handleClickOutside = useCallback((e: MouseEvent) => {
+    if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+      setOpen(false);
+    }
+  }, []);
 
   useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
-        setOpen(false);
-      }
-    };
     document.addEventListener("click", handleClickOutside);
     return () => document.removeEventListener("click", handleClickOutside);
-  }, []);
+  }, [handleClickOutside]);
+
+  useEffect(() => {
+    if (user) {
+      const imageUrl = user.profileImageUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.username || "User")}`;
+      setProfileImageUrl(imageUrl);
+    } else {
+      setProfileImageUrl("https://ui-avatars.com/api/?name=User");
+    }
+  }, [user]);
 
   return (
     <header className="h-14 md:h-16 bg-background-light text-text-base font-sans shadow-md flex items-center justify-between px-4 md:px-6 border-b border-background-dark">
       <div className="flex items-center gap-3">
+        <button
+          type="button"
+          aria-label="Open menu"
+          onClick={onMenuClick}
+          className="md:hidden p-2 rounded-md text-text-muted hover:text-text-base hover:bg-background-dark/40 focus:outline-none focus:ring-2 focus:ring-accent-blue"
+        >
+          <Menu className="w-5 h-5" />
+        </button>
         <PageIcon size={24} className="text-accent-blue" />
         <h1 className="text-xl md:text-2xl font-bold text-accent-blue">{title}</h1>
       </div>
 
       <div className="flex items-center gap-4 md:gap-6">
         {/* Notifications */}
-        <div className="relative">
-          <Bell className="w-5 h-5 md:w-6 md:h-6 text-text-muted cursor-pointer hover:text-accent-blue transition-colors duration-200" />
+        <button
+          type="button"
+          aria-label="Notifications"
+          className="relative focus:outline-none focus:ring-2 focus:ring-accent-blue rounded-md p-1"
+        >
+          <Bell className="w-5 h-5 md:w-6 md:h-6 text-text-muted hover:text-accent-blue transition-colors duration-200" />
           <span className="absolute -top-1 right-0 block h-2 w-2 rounded-full ring-2 ring-background-light bg-error-red"></span>
-        </div>
+        </button>
 
         {/* Profile Dropdown */}
         <div className="relative" ref={dropdownRef}>
@@ -69,21 +98,14 @@ export default function Topbar() {
             className="focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-blue rounded-full"
           >
             <img
-              src={
-                (() => {
-                  const storedUser = localStorage.getItem("user");
-                  if (storedUser) {
-                    const user = JSON.parse(storedUser);
-                    return (
-                      user.profileImageUrl ||
-                      `https://ui-avatars.com/api/?name=${encodeURIComponent(user.username || "User")}`
-                    );
-                  }
-                  return "https://ui-avatars.com/api/?name=User";
-                })()
-              }
+              src={profileImageUrl}
               alt="User profile"
               className="w-8 h-8 md:w-10 md:h-10 rounded-full border-2 border-accent-blue cursor-pointer object-cover"
+              onError={(e) => {
+                const target = e.target as HTMLImageElement;
+                target.src = "https://ui-avatars.com/api/?name=User";
+                setProfileImageUrl("https://ui-avatars.com/api/?name=User");
+              }}
             />
           </button>
 
