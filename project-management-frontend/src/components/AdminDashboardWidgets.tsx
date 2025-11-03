@@ -57,18 +57,33 @@ const AdminDashboardWidgets: React.FC<{ companyId: number }> = ({ companyId }) =
 
   return (
     <div className="p-6 space-y-6">
-      {/* Dashboard Summary Widgets */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+      {/* Dashboard Summary Widgets - List on mobile, cards on larger screens */}
+      <div className="space-y-2 sm:grid sm:gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
         {statWidgets.map((widget, idx) => {
           const Icon = widget.icon;
           return (
-            <Card key={idx} className="hover:shadow-lg transition-shadow">
-              <CardContent className="flex flex-col items-center justify-center text-center p-4">
-                <Icon className="w-6 h-6 text-blue-500 mb-2" />
-                <p className="text-sm text-gray-500">{widget.title}</p>
-                <p className="text-2xl font-semibold">{widget.value}</p>
-              </CardContent>
-            </Card>
+            <div
+              key={idx}
+              className="flex items-center justify-between px-3 py-2 border-b border-gray-800 sm:border-0 sm:block sm:p-0"
+            >
+              {/* Mobile list row */}
+              <div className="flex w-full items-center gap-3 sm:hidden">
+                <Icon className="w-5 h-5 text-blue-500" />
+                <div className="flex-1">
+                  <p className="text-xs text-gray-400">{widget.title}</p>
+                  <p className="text-base font-semibold text-white">{widget.value}</p>
+                </div>
+              </div>
+
+              {/* Card on >= sm */}
+              <Card className="hidden sm:block hover:shadow-lg transition-shadow">
+                <CardContent className="flex flex-col items-center justify-center text-center p-4">
+                  <Icon className="w-6 h-6 text-blue-500 mb-2" />
+                  <p className="text-sm text-gray-500">{widget.title}</p>
+                  <p className="text-2xl font-semibold">{widget.value}</p>
+                </CardContent>
+              </Card>
+            </div>
           );
         })}
       </div>

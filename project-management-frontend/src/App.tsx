@@ -29,7 +29,7 @@ function App() {
   const hideLayout = location.pathname === "/login" || location.pathname === "/register" || location.pathname === "/register-company";
 
   return (
-    <div className="flex h-screen bg-background-dark text-text-base overflow-x-hidden">
+    <div className="flex min-h-screen bg-background-dark text-text-base overflow-x-hidden">
       {isAuthenticated && !hideLayout && (
         <Sidebar open={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
       )}
