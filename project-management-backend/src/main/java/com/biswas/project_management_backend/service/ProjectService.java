@@ -8,6 +8,7 @@ import com.biswas.project_management_backend.dto.mapper.UserDtoMapper;
 import com.biswas.project_management_backend.model.Project;
 import com.biswas.project_management_backend.model.Team;
 import com.biswas.project_management_backend.model.User;
+import com.biswas.project_management_backend.model.enm.NotificationType;
 import com.biswas.project_management_backend.model.enm.ProjectStatus;
 import com.biswas.project_management_backend.repository.ProjectRepository;
 import com.biswas.project_management_backend.repository.TeamRepository;
@@ -39,6 +40,9 @@ public class ProjectService {
     @Autowired
     TeamRepository teamRepository;
 
+    @Autowired
+    NotificationService notificationService;
+
     public List<Project> getProjectsByTeamId(Long teamId){
         return projectRepo.findByTeamId(teamId);
     }
@@ -59,15 +63,30 @@ public class ProjectService {
             }
         }
 
-        // Set members and count
         projectDto.setMembers(projectMembers);
         projectDto.setMemberCount(projectMembers.size());
 
-        // Map DTO to entity and save
         Project project = dtoMapper.toEntity(projectDto);
         Project savedProject = projectRepo.save(project);
 
+        sendNotifications(savedProject.getMembers(), savedProject);
+
         return dtoMapper.toDto(savedProject);
+    }
+
+    public void sendNotifications(Set<User> recipients, Project project) {
+
+        if (recipients != null) {
+            for (User recipient: recipients) {
+                notificationService.createNotification(
+                        recipient,
+                        "Your team has been assigned a new project: " + project.getName(),
+                        NotificationType.PROJECT_ASSIGNED,
+                        project.getId()
+                );
+            }
+        }
+
     }
 
 

@@ -5,20 +5,24 @@ import com.biswas.project_management_backend.dto.UserDto;
 import com.biswas.project_management_backend.model.Company;
 import com.biswas.project_management_backend.model.Team;
 import com.biswas.project_management_backend.model.User;
+import com.biswas.project_management_backend.repository.CompanyRepository;
+import com.biswas.project_management_backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Component
 public class TeamDtoMapper implements DtoMapper<Team, TeamDto> {
 
     @Autowired
     private UserDtoMapper userDtoMapper;
+
+    @Autowired
+    private CompanyRepository companyRepository;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Override
     public TeamDto toDto(Team team) {
@@ -54,9 +58,31 @@ public class TeamDtoMapper implements DtoMapper<Team, TeamDto> {
         if (dto == null) return null;
 
         Team team = new Team();
-        team.setId(dto.getId());
+
+        if(dto.getId() != null) {
+            team.setId(dto.getId());
+        }
+
         team.setName(dto.getName());
         team.setDescription(dto.getDescription());
+
+        Company company = companyRepository.getById(dto.getCompanyId());
+        team.setCompany(company);
+
+        if (dto.getMemberEmails() != null && !dto.getMemberEmails().isEmpty()) {
+            Set<User> members = new HashSet<>();
+
+            for(String memberEmail: dto.getMemberEmails()){
+                User member = userRepository.findByEmail(memberEmail)
+                        .orElseThrow(() -> new RuntimeException("User not found with email: " + memberEmail));
+                members.add(member);
+            }
+
+            team.setMembers(members);
+        } else {
+            team.setMembers(new HashSet<>());
+        }
+
         return team;
     }
 

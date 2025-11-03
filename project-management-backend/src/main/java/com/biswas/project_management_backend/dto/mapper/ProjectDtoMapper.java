@@ -75,8 +75,10 @@ public class ProjectDtoMapper implements DtoMapper<Project, ProjectDto> {
             Team team = teamDtoMapper.toEntity(dto.getTeam());
             if (team != null && team.getId() != null) {
                 Team fullTeam = teamRepository.getById(team.getId());
-                Set<User> members = fullTeam.getMembers() != null ? fullTeam.getMembers() : new HashSet<>();
-                project.setMembers(members);
+                Set<User> copiedMembers = fullTeam.getMembers() != null
+                        ? new HashSet<>(fullTeam.getMembers())
+                        : new HashSet<>();
+                project.setMembers(copiedMembers);
                 project.setTeam(fullTeam);
             }
         }
