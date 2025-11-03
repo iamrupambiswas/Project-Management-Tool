@@ -4,6 +4,9 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   base: "/",
   plugins: [react()],
+  define: {
+    global: 'globalThis', // 👈 Fixes SockJS / STOMP global issue
+  },
   preview: {
    port: 5173,
    strictPort: true,

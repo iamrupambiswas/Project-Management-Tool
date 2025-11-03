@@ -37,8 +37,8 @@ public class UserController {
     @GetMapping("/analytics")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<UserAnalyticsDto> getUserAnalytics(@RequestParam Long companyId, Authentication auth) {
-        String username = auth.getName();
-        UserAnalyticsDto analytics = analyticsService.getUserAnalytics(username, companyId);
+        String userEmail = auth.getName();
+        UserAnalyticsDto analytics = analyticsService.getUserAnalytics(userEmail, companyId);
         return ResponseEntity.ok(analytics);
     }
 

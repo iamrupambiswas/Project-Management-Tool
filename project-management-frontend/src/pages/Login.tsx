@@ -7,7 +7,7 @@ import { Mail, Lock, ArrowRight, Sparkles } from "lucide-react";
 import loginImage from "../assets/login-image.png";
 
 export default function Login() {
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState("");
@@ -20,7 +20,7 @@ export default function Login() {
     e.preventDefault();
     setIsLoading(true);
     try {
-      const data = await login({ username, password });
+      const data = await login({ email: email, password });
       setToken(data.token ?? null);
       setUser(data.user ?? null);
       navigate("/dashboard");
@@ -111,15 +111,15 @@ export default function Login() {
               {/* Username Input */}
               <div>
                 <label className="block text-text-muted text-sm mb-2 font-['Inter']">
-                  Username
+                  Email
                 </label>
                 <div className="relative group">
                   <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-text-muted group-focus-within:text-accent-blue transition-colors" />
                   <input
-                    type="text"
-                    placeholder="Enter your username"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
+                    type="email"
+                    placeholder="Enter your email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     className="w-full pl-12 pr-4 py-3 text-text-base bg-background-content/50 border border-background-light rounded-xl focus:border-accent-blue focus:ring-2 focus:ring-accent-blue/20 outline-none transition-all placeholder:text-text-muted/50"
                     required
                   />

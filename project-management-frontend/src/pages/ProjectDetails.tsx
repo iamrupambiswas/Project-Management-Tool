@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import LoadingSpinner from "../components/common/LoadingSpinner";
 import { getProjectById } from "../services/projectService";
 import { getTasksByProjectId } from "../services/taskService"; // Import the task service
-import type { ProjectDto as Project, TaskDto } from "../@api/models";
+import type { ProjectDto as Project, TaskDto, UserDto } from "../@api/models";
 import { TaskDtoStatusEnum } from "../@api/models";
 import { 
   ArrowLeft, Calendar, CheckCircle, FolderOpen, Tag, Users,
@@ -306,10 +306,16 @@ export default function ProjectDetails() {
                 projectId={projectId}
                 creatorId={currentUserId} 
                 teamMembers={
-                    project.team?.memberEmails 
-                    ? Array.from(project.team.memberEmails) as any 
+                  project.team?.members
+                    ? project.team.members
+                        .filter((m): m is UserDto & { id: number } => m.id !== undefined)
+                        .map(m => ({
+                          id: m.id,
+                          username: m.username || "Unnamed User",
+                          email: m.email,
+                        }))
                     : []
-                } 
+                }                                             
                 onClose={() => setShowTaskModal(false)}
                 onTaskCreated={handleTaskCreated}
             />

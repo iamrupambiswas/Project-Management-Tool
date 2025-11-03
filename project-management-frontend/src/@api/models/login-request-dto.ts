@@ -24,7 +24,7 @@ export interface LoginRequestDto {
      * @type {string}
      * @memberof LoginRequestDto
      */
-    username?: string;
+    email?: string;
     /**
      * 
      * @type {string}
@@ -50,7 +50,7 @@ export function LoginRequestDtoFromJSONTyped(json: any, ignoreDiscriminator: boo
     }
     return {
         
-        'username': json['username'] == null ? undefined : json['username'],
+        'email': json['email'] == null ? undefined : json['email'],
         'password': json['password'] == null ? undefined : json['password'],
     };
 }
@@ -66,7 +66,7 @@ export function LoginRequestDtoToJSONTyped(value?: LoginRequestDto | null, ignor
 
     return {
         
-        'username': value['username'],
+        'email': value['email'],
         'password': value['password'],
     };
 }

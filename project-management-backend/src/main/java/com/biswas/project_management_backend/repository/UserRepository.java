@@ -17,6 +17,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     List<User> findByCompanyId(Long companyId);
     Long countByCompanyId(Long companyId);
     User findByUsernameAndCompanyId(String userName, Long companyId);
+    User findByEmailAndCompanyId(String email, Long CompanyId);
 
     @Query("SELECT COUNT(u) FROM User u WHERE u.company.id = :companyId AND u.lastActiveDate >= :sinceDate")
     Long countActiveUsersLastWeek(@Param("companyId") Long companyId, @Param("sinceDate") LocalDate sinceDate);
