@@ -10,7 +10,7 @@ COPY src ./src
 RUN mvn clean package -DskipTests
 
 # Step 2: Run the application using a lightweight JDK image
-FROM openjdk:21-slim
+FROM eclipse-temurin:21-jdk-alpine
 WORKDIR /app
 COPY --from=builder /app/target/project-management-backend.jar project-management-backend.jar
 

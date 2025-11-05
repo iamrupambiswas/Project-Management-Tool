@@ -45,8 +45,13 @@ export default function Projects() {
   };
 
   const handleProjectCreated = (newProject: Project) => {
-    setProjects((prev) => [newProject, ...prev]);
-  };
+    const normalized: Project = {
+      ...newProject,
+      startDate: newProject.startDate ? new Date(newProject.startDate) : undefined,
+      endDate: newProject.endDate ? new Date(newProject.endDate) : undefined,
+    };
+    setProjects((prev) => [normalized as Project, ...prev]);
+  };   
 
   if (loading) {
     return (

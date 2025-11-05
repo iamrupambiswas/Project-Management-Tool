@@ -46,9 +46,26 @@ export default function Topbar() {
   const title = activeRoute?.title || "Page";
   const PageIcon = activeRoute?.Icon || LayoutDashboard;
 
+  const handleNotificationClick = async (notification: any) => {
+    console.log("📩 Notification clicked:", notification);
+
+    await markAsRead(notification.id, token!);
+  
+    setNotifOpen(false);
+  
+    if (notification.type === "TASK_ASSIGNED" && notification.relatedEntityId) {
+      navigate(`/tasks/${notification.relatedEntityId}`);
+    } else if (notification.type === "PROJECT_ASSIGNED" && notification.relatedEntityId) {
+      navigate(`/projects/${notification.relatedEntityId}`);
+    } else {
+      navigate("/dashboard");
+    }
+  };  
+
   useEffect(() => {
     if (user?.id && token) {
       fetchNotifications(token);
+      console.log("🔔 Notifications fetched:", notifications);
     }
   }, [token, fetchNotifications]);
 
@@ -116,9 +133,7 @@ export default function Topbar() {
                   {notifications.map((n) => (
                     <li
                       key={n.id}
-                      onClick={async () => {
-                        await markAsRead(n.id, token!);
-                      }}
+                      onClick={() => handleNotificationClick(n)}
                       className={`p-3 cursor-pointer hover:bg-gray-100 transition-colors ${
                         !n.read ? "font-semibold" : "text-gray-500"
                       }`}
