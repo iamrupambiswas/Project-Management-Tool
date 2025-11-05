@@ -152,30 +152,20 @@ export default function Topbar({ onMenuClick }: TopbarProps) {
               ) : (
                 <ul className="divide-y divide-background-dark">
                   {notifications.map((n) => (
-                    <li key={n.id}>
-                      <button
-                        className={`w-full text-left px-4 py-3 text-sm transition-colors ${
-                          !n.read ? 'text-text-base hover:bg-background-dark/60' : 'text-gray-500 hover:bg-background-dark/40'
-                        }`}
-                        onClick={() => handleNotificationClick(n)}
-                      >
-                        <div className="flex items-start gap-3">
-                          <span className={`mt-1 inline-block h-2 w-2 rounded-full ${!n.read ? 'bg-accent-blue' : 'bg-gray-600'}`} />
-                          <div>
-                            <p className="leading-snug">{n.message}</p>
-                            <p className="mt-1 text-[11px] text-gray-500">{new Date(n.createdAt).toLocaleString()}</p>
-                          </div>
-                        </div>
-                      </button>
                     <li
                       key={n.id}
-                      onClick={() => handleNotificationClick(n)}
-                      className={`p-3 cursor-pointer hover:bg-gray-100 transition-colors ${
-                        !n.read ? "font-semibold" : "text-gray-500"
+                      className={`p-3 cursor-pointer transition-colors ${
+                        !n.read ? "font-semibold hover:bg-background-dark/60" : "text-gray-500 hover:bg-background-dark/40"
                       }`}
+                      onClick={() => handleNotificationClick(n)}
                     >
-                      <p className="text-sm">{n.message}</p>
-                      <p className="text-xs text-text-muted">{n.createdAt}</p>
+                      <div className="flex items-start gap-3">
+                        <span className={`mt-1 inline-block h-2 w-2 rounded-full ${!n.read ? 'bg-accent-blue' : 'bg-gray-600'}`} />
+                        <div>
+                          <p className="text-sm leading-snug">{n.message}</p>
+                          <p className="mt-1 text-[11px] text-gray-500">{new Date(n.createdAt).toLocaleString()}</p>
+                        </div>
+                      </div>
                     </li>
                   ))}
                 </ul>
