@@ -167,6 +167,15 @@ export default function Topbar({ onMenuClick }: TopbarProps) {
                           </div>
                         </div>
                       </button>
+                    <li
+                      key={n.id}
+                      onClick={() => handleNotificationClick(n)}
+                      className={`p-3 cursor-pointer hover:bg-gray-100 transition-colors ${
+                        !n.read ? "font-semibold" : "text-gray-500"
+                      }`}
+                    >
+                      <p className="text-sm">{n.message}</p>
+                      <p className="text-xs text-text-muted">{n.createdAt}</p>
                     </li>
                   ))}
                 </ul>

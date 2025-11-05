@@ -7,6 +7,7 @@ type Notification = {
   type: string;
   createdAt: string;
   read: boolean;
+  relatedEntityId: number;
 };
 
 type NotificationStore = {
@@ -26,6 +27,7 @@ export const useNotificationStore = create<NotificationStore>((set) => ({
         headers: { Authorization: `Bearer ${token}` },
       });
       set({ notifications: res.data });
+      console.log(res.data);
     } catch (err) {
       console.error("Failed to fetch notifications:", err);
     }
