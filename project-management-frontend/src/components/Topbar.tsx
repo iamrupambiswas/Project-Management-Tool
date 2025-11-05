@@ -12,6 +12,7 @@ import {
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ComponentType, useState, useRef, useEffect, useCallback } from "react";
 import { useAuthStore } from "../store/authStore";
+import { useNotificationStore } from "../store/notificationStore";
 
 type LucideIcon = ComponentType<{ size: number; className?: string }>;
 
@@ -40,14 +41,27 @@ export default function Topbar({ onMenuClick }: TopbarProps) {
   const PageIcon = activeRoute?.Icon || LayoutDashboard;
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
+  const [notifOpen, setNotifOpen] = useState(false);
   const [profileImageUrl, setProfileImageUrl] = useState<string>("https://ui-avatars.com/api/?name=User");
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const notifRef = useRef<HTMLDivElement>(null);
   const logout = useAuthStore((s) => s.logout);
   const user = useAuthStore((s) => s.user);
+  const token = useAuthStore((s) => s.token);
+
+  const notifications = useNotificationStore((s) => s.notifications);
+  const fetchNotifications = useNotificationStore((s) => s.fetchNotifications);
+  const markAsRead = useNotificationStore((s) => s.markAsRead);
+  const markAllAsRead = useNotificationStore((s) => s.markAllAsRead);
+  const unreadCount = notifications.filter((n) => !n.read).length;
 
   const handleClickOutside = useCallback((e: MouseEvent) => {
-    if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+    const target = e.target as Node;
+    if (dropdownRef.current && !dropdownRef.current.contains(target)) {
       setOpen(false);
+    }
+    if (notifRef.current && !notifRef.current.contains(target)) {
+      setNotifOpen(false);
     }
   }, []);
 
@@ -64,6 +78,19 @@ export default function Topbar({ onMenuClick }: TopbarProps) {
       setProfileImageUrl("https://ui-avatars.com/api/?name=User");
     }
   }, [user]);
+
+  useEffect(() => {
+    if (notifOpen && token) {
+      fetchNotifications(token);
+    }
+  }, [notifOpen, token, fetchNotifications]);
+
+  const handleNotificationClick = async (n: { id: number }) => {
+    if (token) {
+      await markAsRead(n.id, token);
+    }
+    setNotifOpen(false);
+  };
 
   return (
     <header className="h-14 md:h-16 bg-background-light text-text-base font-sans shadow-md flex items-center justify-between px-4 md:px-6 border-b border-background-dark">
@@ -82,14 +109,71 @@ export default function Topbar({ onMenuClick }: TopbarProps) {
 
       <div className="flex items-center gap-4 md:gap-6">
         {/* Notifications */}
-        <button
-          type="button"
-          aria-label="Notifications"
-          className="relative focus:outline-none focus:ring-2 focus:ring-accent-blue rounded-md p-1"
-        >
-          <Bell className="w-5 h-5 md:w-6 md:h-6 text-text-muted hover:text-accent-blue transition-colors duration-200" />
-          <span className="absolute -top-1 right-0 block h-2 w-2 rounded-full ring-2 ring-background-light bg-error-red"></span>
-        </button>
+        <div className="relative" ref={notifRef}>
+          <button
+            type="button"
+            aria-label="Notifications"
+            aria-expanded={notifOpen}
+            aria-haspopup="menu"
+            onClick={() => setNotifOpen((v) => !v)}
+            className="relative focus:outline-none focus:ring-2 focus:ring-accent-blue rounded-md p-1"
+          >
+            <Bell className="w-5 h-5 md:w-6 md:h-6 text-text-muted hover:text-accent-blue transition-colors duration-200" />
+            {unreadCount > 0 && (
+              <span className="absolute -top-1 -right-1 flex items-center justify-center h-4 w-4 rounded-full bg-error-red text-white text-[10px] font-bold">
+                {unreadCount > 9 ? '9+' : unreadCount}
+              </span>
+            )}
+          </button>
+
+          {notifOpen && (
+            <div
+              role="menu"
+              className="absolute right-0 mt-3 w-72 sm:w-80 bg-background-light border border-background-dark rounded-xl shadow-lg py-2 z-50 animate-fadeIn max-h-96 overflow-y-auto"
+            >
+              <div className="flex items-center justify-between px-3 pb-2 border-b border-background-dark">
+                <span className="text-sm text-text-base">Notifications</span>
+                {notifications.length > 0 && (
+                  <button
+                    className="text-xs text-accent-blue hover:underline"
+                    onClick={async () => {
+                      if (user?.id && token) {
+                        await markAllAsRead(user.id, token);
+                      }
+                      setNotifOpen(false);
+                    }}
+                  >
+                    Clear All
+                  </button>
+                )}
+              </div>
+              {notifications.length === 0 ? (
+                <div className="px-4 py-3 text-sm text-gray-400">No new notifications</div>
+              ) : (
+                <ul className="divide-y divide-background-dark">
+                  {notifications.map((n) => (
+                    <li key={n.id}>
+                      <button
+                        className={`w-full text-left px-4 py-3 text-sm transition-colors ${
+                          !n.read ? 'text-text-base hover:bg-background-dark/60' : 'text-gray-500 hover:bg-background-dark/40'
+                        }`}
+                        onClick={() => handleNotificationClick(n)}
+                      >
+                        <div className="flex items-start gap-3">
+                          <span className={`mt-1 inline-block h-2 w-2 rounded-full ${!n.read ? 'bg-accent-blue' : 'bg-gray-600'}`} />
+                          <div>
+                            <p className="leading-snug">{n.message}</p>
+                            <p className="mt-1 text-[11px] text-gray-500">{new Date(n.createdAt).toLocaleString()}</p>
+                          </div>
+                        </div>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          )}
+        </div>
 
         {/* Profile Dropdown */}
         <div className="relative" ref={dropdownRef}>
