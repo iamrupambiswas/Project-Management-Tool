@@ -2,6 +2,7 @@ package com.biswas.project_management_backend.controller.auth;
 
 import com.biswas.project_management_backend.dto.AuthResponseDto;
 import com.biswas.project_management_backend.dto.LoginRequestDto;
+import com.biswas.project_management_backend.dto.RefreshTokenRequestDto;
 import com.biswas.project_management_backend.dto.RegisterCompanyRequestDto;
 import com.biswas.project_management_backend.dto.RegisterRequestDto;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +23,12 @@ public interface AuthApi {
 
     @PostMapping("/login")
     AuthResponseDto login(@RequestBody LoginRequestDto request);
+
+    @PostMapping("/refresh")
+    ResponseEntity<AuthResponseDto> refresh(@RequestBody RefreshTokenRequestDto request);
+
+    @PostMapping("/logout")
+    ResponseEntity<String> logout(@RequestBody RefreshTokenRequestDto request);
 
     @PostMapping("/change-password")
     ResponseEntity<?> changePassword(
