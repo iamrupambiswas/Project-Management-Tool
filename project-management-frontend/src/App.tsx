@@ -24,6 +24,7 @@ import { useNotificationStore } from "./store/notificationStore";
 import { useCallback, useEffect, useState } from "react";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import MemberDetails from "./pages/MemberDetails/MemberDetails";
 
 function App() {
   const isAuthenticated = useAuthStore((state) => state.token);
@@ -85,6 +86,14 @@ useWebSocket(userId ?? 0, handleWebSocketMessage);
             <Route 
               path="/members" 
               element={<Members />} 
+            />
+            <Route
+              path="/members/:id"
+              element={
+                <ProtectedRoute>
+                  <MemberDetails />
+                </ProtectedRoute>
+              }
             />
             <Route
               path="/projects"
