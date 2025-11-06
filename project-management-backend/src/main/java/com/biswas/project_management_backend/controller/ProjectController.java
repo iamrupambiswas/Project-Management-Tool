@@ -4,7 +4,6 @@ import com.biswas.project_management_backend.dto.ProjectDto;
 import com.biswas.project_management_backend.model.enm.ProjectStatus;
 import com.biswas.project_management_backend.service.ProjectService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,7 +16,6 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class ProjectController {
 
-    @Autowired
     private final ProjectService projectService;
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)

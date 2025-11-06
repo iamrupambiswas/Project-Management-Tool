@@ -8,7 +8,7 @@ import com.biswas.project_management_backend.dto.RegisterRequestDto;
 import com.biswas.project_management_backend.security.JwtUtil;
 import com.biswas.project_management_backend.service.AuthService;
 import com.biswas.project_management_backend.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -18,16 +18,12 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Map;
 
 @RestController
+@RequiredArgsConstructor
 public class AuthApiController implements AuthApi {
 
-    @Autowired
-    private UserService userService;
-
-    @Autowired
-    private JwtUtil jwtUtil;
-
-    @Autowired
-    private AuthService authService;
+    private final UserService userService;
+    private final JwtUtil jwtUtil;
+    private final AuthService authService;
 
     @Override
     public ResponseEntity<AuthResponseDto> register(RegisterCompanyRequestDto request) {
