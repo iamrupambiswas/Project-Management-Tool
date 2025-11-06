@@ -19,6 +19,8 @@ html, body, #root {
 
 html {
   scroll-behavior: smooth;
+  /* Responsive root font sizing for better readability on all screens */
+  font-size: clamp(14px, 1.6vw, 16px);
 }
 
 /* Custom Animation for Cyber Background */
@@ -104,6 +106,11 @@ html {
 html, body, main {
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch; /* bounce/inertia */
+}
+
+/* Prevent horizontal scroll and ensure content fits viewport on mobile */
+body, #root {
+  overflow-x: hidden;
 }
 
 * {

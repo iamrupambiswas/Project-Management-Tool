@@ -1,5 +1,6 @@
-package com.biswas.project_management_backend.controller;
+package com.biswas.project_management_backend.controller.impl;
 
+import com.biswas.project_management_backend.controller.api.AdminApi;
 import com.biswas.project_management_backend.dto.AdminAnalyticsDto;
 import com.biswas.project_management_backend.service.AdminService;
 import com.biswas.project_management_backend.service.AnalyticsService;
@@ -7,31 +8,27 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
-@RequestMapping("/api/admin")
 @PreAuthorize("hasRole('ADMIN')")
-public class AdminController {
+public class AdminApiController implements AdminApi {
 
     @Autowired
     private AnalyticsService analyticsService;
 
     @Autowired
-    AdminService adminService;
+    private AdminService adminService;
 
-    @GetMapping("/analytics/summary")
-    public ResponseEntity<AdminAnalyticsDto> getAnalyticsSummary(
-            @RequestParam Long companyId,
-            @RequestParam(required = false) String dateFrom,
-            @RequestParam(required = false) String dateTo) {
+    @Override
+    public ResponseEntity<AdminAnalyticsDto> getAnalyticsSummary(Long companyId, String dateFrom, String dateTo) {
         AdminAnalyticsDto summary = analyticsService.getAnalyticsSummary(companyId, dateFrom, dateTo);
         return ResponseEntity.ok(summary);
     }
 
-    @PostMapping("/users/upload")
-    public ResponseEntity<String> uploadUserCSV(@RequestParam("file") MultipartFile file, Authentication authentication) {
+    @Override
+    public ResponseEntity<String> uploadUserCSV(MultipartFile file, Authentication authentication) {
         try {
             if (file.isEmpty()) {
                 return ResponseEntity.badRequest().body("File is empty");

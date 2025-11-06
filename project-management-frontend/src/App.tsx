@@ -19,46 +19,25 @@ import TaskDetails from './pages/TaskDetails';
 import TeamDetails from './pages/TeamDetails';
 import ProfilePage from './pages/Profile';
 import NotFound from "./pages/NotFound"; 
-import { useWebSocket } from "./hooks/useWebSocket";
-import { useNotificationStore } from "./store/notificationStore";
-import { useCallback, useEffect, useState } from "react";
-import { ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { useState } from "react";
 
 function App() {
   const isAuthenticated = useAuthStore((state) => state.token);
-  const user = useAuthStore((state) => state.user);
   const location = useLocation();
-  const addNotification = useNotificationStore((state) => state.addNotification);
-  const [userId, setUserId] = useState<number | null>(null);
-
-  useEffect(() => {
-    if (user?.id) {
-      setUserId(user.id);
-    } else {
-      const stored = localStorage.getItem("user");
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        setUserId(parsed.id);
-      }
-    }
-  }, [user]);
-
-  
-  const handleWebSocketMessage = useCallback((data: any) => {
-    addNotification(data);
-  }, [addNotification]);  
-
-useWebSocket(userId ?? 0, handleWebSocketMessage);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const hideLayout = location.pathname === "/login" || location.pathname === "/register" || location.pathname === "/register-company";
 
   return (
-    <div className="flex h-screen bg-background-dark text-text-base">
-      {isAuthenticated && !hideLayout && <Sidebar />}
+    <div className="flex min-h-screen bg-background-dark text-text-base overflow-x-hidden">
+      {isAuthenticated && !hideLayout && (
+        <Sidebar open={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+      )}
 
       <div className="flex-1 flex flex-col overflow-hidden">
-        {isAuthenticated && !hideLayout && <Topbar />}
+        {isAuthenticated && !hideLayout && (
+          <Topbar onMenuClick={() => setIsSidebarOpen(true)} />
+        )}
 
         <main className="flex-1 overflow-y-auto scroll-smooth bg-background-content">
           <Routes>
@@ -138,8 +117,6 @@ useWebSocket(userId ?? 0, handleWebSocketMessage);
             {/* 404 Route - MUST BE LAST */}
             <Route path="*" element={<NotFound />} />
           </Routes>
-
-          <ToastContainer />
 
           <Analytics />
           
