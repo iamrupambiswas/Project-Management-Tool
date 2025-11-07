@@ -15,7 +15,6 @@ import com.biswas.project_management_backend.repository.TeamRepository;
 import com.biswas.project_management_backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -91,7 +90,7 @@ public class ProjectService {
 
 
 
-    public List<ProjectDto> getAllProjects(@PathVariable Long companyId) {
+    public List<ProjectDto> getAllProjects(Long companyId) {
         List<Project> projects = projectRepo.findByCompanyId(companyId);
         return projects.stream()
                 .map(dtoMapper::toDto)
