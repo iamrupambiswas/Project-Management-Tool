@@ -25,7 +25,6 @@ import { useCallback, useEffect, useState } from "react";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import MemberDetails from "./pages/MemberDetails/MemberDetails";
-import { useState } from "react";
 
 function App() {
   const isAuthenticated = useAuthStore((state) => state.token);
