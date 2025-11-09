@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Set;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/users")
@@ -32,6 +33,13 @@ public class UserController {
         return userService.getUser(id);
     }
 
+    @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<UserDto> updateUser(@PathVariable Long id, @RequestBody UserDto dto) {
+        UserDto updated = userService.updateUser(id, dto);
+        return ResponseEntity.ok(updated);
+    }
+
     @GetMapping("/analytics")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<UserAnalyticsDto> getUserAnalytics(@RequestParam Long companyId, Authentication auth) {
@@ -48,6 +56,20 @@ public class UserController {
     ) {
         UserDto updatedUser = userService.updateUserRoles(userId, roleNames);
         return ResponseEntity.ok(updatedUser);
+    }
+
+    @PutMapping("/{userId}/password")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> updateUserPassword(
+            @PathVariable Long userId,
+            @RequestBody Map<String, String> body
+    ) {
+        String newPassword = body.get("newPassword");
+        if (newPassword == null || newPassword.isBlank()) {
+            return ResponseEntity.badRequest().build();
+        }
+        userService.adminUpdatePassword(userId, newPassword);
+        return ResponseEntity.noContent().build();
     }
 
 }
