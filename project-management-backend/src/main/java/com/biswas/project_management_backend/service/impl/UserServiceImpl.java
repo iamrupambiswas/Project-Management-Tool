@@ -3,12 +3,14 @@ package com.biswas.project_management_backend.service.impl;
 import com.biswas.project_management_backend.dto.*;
 import com.biswas.project_management_backend.dto.mapper.UserDtoMapper;
 import com.biswas.project_management_backend.model.Company;
+import com.biswas.project_management_backend.model.RefreshToken;
 import com.biswas.project_management_backend.model.Role;
 import com.biswas.project_management_backend.model.User;
 import com.biswas.project_management_backend.repository.CompanyRepository;
 import com.biswas.project_management_backend.repository.RoleRepository;
 import com.biswas.project_management_backend.repository.UserRepository;
 import com.biswas.project_management_backend.security.JwtUtil;
+import com.biswas.project_management_backend.service.RefreshTokenService;
 import com.biswas.project_management_backend.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -30,6 +32,7 @@ public class UserServiceImpl implements UserService {
     private final UserDtoMapper userDtoMapper;
     private final RoleRepository roleRepository;
     private final CompanyRepository companyRepository;
+    private final RefreshTokenService refreshTokenService;
 
     // ---------------- AUTH ----------------
     @Override
@@ -57,9 +60,11 @@ public class UserServiceImpl implements UserService {
         claims.put("companyId", savedCompany.getId());
         String token = jwtUtil.generateToken(savedAdmin.getEmail(), claims);
 
+        RefreshToken refreshToken = refreshTokenService.createRefreshToken(savedAdmin.getId());
+
         UserDto userDto = userDtoMapper.toDto(savedAdmin);
 
-        return new AuthResponseDto(token, userDto);
+        return new AuthResponseDto(token, refreshToken.getToken(), userDto);
     }
 
     @Override
@@ -88,9 +93,11 @@ public class UserServiceImpl implements UserService {
         if (company != null) claims.put("companyId", company.getId());
         String token = jwtUtil.generateToken(savedUser.getEmail(), claims);
 
+        RefreshToken refreshToken = refreshTokenService.createRefreshToken(savedUser.getId());
+
         UserDto userDto = userDtoMapper.toDto(savedUser);
 
-        return new AuthResponseDto(token, userDto);
+        return new AuthResponseDto(token, refreshToken.getToken(), userDto);
     }
 
     @Override
@@ -114,9 +121,12 @@ public class UserServiceImpl implements UserService {
         }
 
         String token = jwtUtil.generateToken(authRequest.getEmail(), claims);
+
+        RefreshToken refreshToken = refreshTokenService.createRefreshToken(user.getId());
+
         UserDto userDto = userDtoMapper.toDto(user);
 
-        return new AuthResponseDto(token, userDto);
+        return new AuthResponseDto(token, refreshToken.getToken(), userDto);
     }
 
     // ---------------- CRUD ----------------
@@ -213,5 +223,35 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
+    }
+
+    @Override
+    public AuthResponseDto refreshToken(String refreshTokenStr) {
+        RefreshToken refreshToken = refreshTokenService.findByToken(refreshTokenStr)
+                .orElseThrow(() -> new RuntimeException("Invalid refresh token"));
+
+        refreshToken = refreshTokenService.verifyExpiration(refreshToken);
+
+        User user = refreshToken.getUser();
+
+        Map<String, Object> claims = new HashMap<>();
+        if (user.getCompany() != null) {
+            claims.put("companyId", user.getCompany().getId());
+        }
+        String newAccessToken = jwtUtil.generateToken(user.getEmail(), claims);
+
+        RefreshToken newRefreshToken = refreshTokenService.createRefreshToken(user.getId());
+
+        UserDto userDto = userDtoMapper.toDto(user);
+
+        return new AuthResponseDto(newAccessToken, newRefreshToken.getToken(), userDto);
+    }
+
+    @Override
+    public void logout(String refreshTokenStr) {
+        RefreshToken refreshToken = refreshTokenService.findByToken(refreshTokenStr)
+                .orElseThrow(() -> new RuntimeException("Invalid refresh token"));
+
+        refreshTokenService.deleteByUserId(refreshToken.getUser().getId());
     }
 }
