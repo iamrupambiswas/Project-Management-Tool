@@ -10,6 +10,7 @@ import com.biswas.project_management_backend.security.JwtUtil;
 import com.biswas.project_management_backend.service.AuthService;
 import com.biswas.project_management_backend.service.RefreshTokenService;
 import com.biswas.project_management_backend.service.UserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,16 +21,12 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Map;
 
 @RestController
+@RequiredArgsConstructor
 public class AuthApiController implements AuthApi {
 
-    @Autowired
-    private UserService userService;
-
-    @Autowired
-    private JwtUtil jwtUtil;
-
-    @Autowired
-    private AuthService authService;
+    private final UserService userService;
+    private final JwtUtil jwtUtil;
+    private final AuthService authService;
 
     @Autowired
     private RefreshTokenService refreshTokenService;

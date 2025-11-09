@@ -4,22 +4,20 @@ import com.biswas.project_management_backend.controller.api.AdminApi;
 import com.biswas.project_management_backend.dto.AdminAnalyticsDto;
 import com.biswas.project_management_backend.service.AdminService;
 import com.biswas.project_management_backend.service.AnalyticsService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+@RequiredArgsConstructor
 @RestController
 @PreAuthorize("hasRole('ADMIN')")
 public class AdminApiController implements AdminApi {
 
-    @Autowired
-    private AnalyticsService analyticsService;
-
-    @Autowired
-    private AdminService adminService;
+    private final AnalyticsService analyticsService;
+    private final AdminService adminService;
 
     @Override
     public ResponseEntity<AdminAnalyticsDto> getAnalyticsSummary(Long companyId, String dateFrom, String dateTo) {
