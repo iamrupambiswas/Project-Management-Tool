@@ -14,6 +14,7 @@ import com.biswas.project_management_backend.repository.TeamRepository;
 import com.biswas.project_management_backend.repository.UserRepository;
 import com.biswas.project_management_backend.service.NotificationService;
 import com.biswas.project_management_backend.service.ProjectService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 
@@ -25,12 +26,23 @@ import java.util.stream.Collectors;
 @Service
 public class ProjectServiceImpl implements ProjectService {
 
+    @Autowired
     private ProjectRepository projectRepo;
+
+    @Autowired
     private ProjectDtoMapper dtoMapper;
-    UserRepository userRepo;
-    UserDtoMapper userDtoMapper;
-    TeamRepository teamRepository;
-    NotificationService notificationService;
+
+    @Autowired
+    private UserRepository userRepo;
+
+    @Autowired
+    private UserDtoMapper userDtoMapper;
+
+    @Autowired
+    private TeamRepository teamRepository;
+
+    @Autowired
+    private NotificationService notificationService;
 
     @Override
     public List<Project> getProjectsByTeamId(Long teamId){

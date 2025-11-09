@@ -206,4 +206,12 @@ public class UserServiceImpl implements UserService {
         User updatedUser = userRepository.save(user);
         return userDtoMapper.toDto(updatedUser);
     }
+
+    @Override
+    public void adminUpdatePassword(Long userId, String newPassword) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+    }
 }
