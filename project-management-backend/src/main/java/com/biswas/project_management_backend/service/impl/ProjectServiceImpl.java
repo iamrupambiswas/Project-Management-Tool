@@ -1,7 +1,6 @@
-package com.biswas.project_management_backend.service;
+package com.biswas.project_management_backend.service.impl;
 
 import com.biswas.project_management_backend.dto.ProjectDto;
-import com.biswas.project_management_backend.dto.TeamDto;
 import com.biswas.project_management_backend.dto.UserDto;
 import com.biswas.project_management_backend.dto.mapper.ProjectDtoMapper;
 import com.biswas.project_management_backend.dto.mapper.UserDtoMapper;
@@ -13,42 +12,32 @@ import com.biswas.project_management_backend.model.enm.ProjectStatus;
 import com.biswas.project_management_backend.repository.ProjectRepository;
 import com.biswas.project_management_backend.repository.TeamRepository;
 import com.biswas.project_management_backend.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.biswas.project_management_backend.service.NotificationService;
+import com.biswas.project_management_backend.service.ProjectService;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-<<<<<<< HEAD
-public interface ProjectService {
-=======
 @Service
-public class ProjectService {
+public class ProjectServiceImpl implements ProjectService {
 
-    @Autowired
     private ProjectRepository projectRepo;
-
-    @Autowired
     private ProjectDtoMapper dtoMapper;
-
-    @Autowired
     UserRepository userRepo;
-
-    @Autowired
     UserDtoMapper userDtoMapper;
-
-    @Autowired
     TeamRepository teamRepository;
-
-    @Autowired
     NotificationService notificationService;
 
+    @Override
     public List<Project> getProjectsByTeamId(Long teamId){
         return projectRepo.findByTeamId(teamId);
     }
 
+    @Override
     public ProjectDto createProject(ProjectDto projectDto) {
         if (projectDto.getTeam() == null || projectDto.getTeam().getId() == null) {
             throw new RuntimeException("Project must have a valid team assigned");
@@ -76,6 +65,7 @@ public class ProjectService {
         return dtoMapper.toDto(savedProject);
     }
 
+    @Override
     public void sendNotifications(Set<User> recipients, Project project) {
 
         if (recipients != null) {
@@ -91,15 +81,15 @@ public class ProjectService {
 
     }
 
-
-
-    public List<ProjectDto> getAllProjects(Long companyId) {
+    @Override
+    public List<ProjectDto> getAllProjects(@PathVariable Long companyId) {
         List<Project> projects = projectRepo.findByCompanyId(companyId);
         return projects.stream()
                 .map(dtoMapper::toDto)
                 .collect(Collectors.toList());
     }
 
+    @Override
     public ProjectDto getProjectById(Long projectId) {
         Project project = projectRepo.findById(projectId)
                 .orElseThrow(() -> new RuntimeException("Project not found with id: " + projectId));
@@ -107,12 +97,14 @@ public class ProjectService {
         return dtoMapper.toDto(project);
     }
 
+    @Override
     public ProjectDto updateProject(ProjectDto projectDto) {
         Project project = dtoMapper.toEntity(projectDto);
         Project updatedProject = projectRepo.save(project);
         return dtoMapper.toDto(updatedProject);
     }
 
+    @Override
     public ProjectDto updateProjectStatus(Long projectId, ProjectStatus status) {
         Project project = projectRepo.getById(projectId);
         project.setStatus(status);
@@ -123,18 +115,8 @@ public class ProjectService {
         return projectDto;
     }
 
+    @Override
     public void deleteProject(Long projectId) {
         projectRepo.deleteById(projectId);
     }
->>>>>>> 70d91563452f25891833f3cf430f48834c5aaf6c
-
-    List<Project> getProjectsByTeamId(Long teamId);
-    ProjectDto createProject(ProjectDto projectDto);
-    void sendNotifications(Set<User> recipients, Project project);
-    List<ProjectDto> getAllProjects(@PathVariable Long companyId);
-    ProjectDto getProjectById(Long projectId);
-    ProjectDto updateProject(ProjectDto projectDto);
-    ProjectDto updateProjectStatus(Long projectId, ProjectStatus status);
-    void deleteProject(Long projectId);
-
 }

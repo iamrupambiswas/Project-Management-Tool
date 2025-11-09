@@ -21,9 +21,7 @@ import java.util.Map;
 public class UserController {
 
     private final UserService userService;
-
-    @Autowired
-    private AnalyticsService analyticsService;
+    private final AnalyticsService analyticsService;
 
     @GetMapping("/company/{companyId}")
     public List<UserDto> getAllUsers(@PathVariable Long companyId){
