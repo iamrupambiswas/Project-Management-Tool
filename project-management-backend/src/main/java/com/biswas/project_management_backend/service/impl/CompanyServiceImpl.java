@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-@Profile("local")
 public class CompanyServiceImpl implements CompanyService {
     private final CompanyRepository companyRepository;
     private final CompanyDtoMapper companyDtoMapper;
