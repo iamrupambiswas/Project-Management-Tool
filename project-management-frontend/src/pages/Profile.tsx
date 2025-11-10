@@ -14,6 +14,7 @@ import { getCompany } from "../services/companyService";
 import { uploadProfileImage, deleteProfileImage } from "../services/commonService";
 import { CompanyDto, UserDto } from "../@api/models";
 import ChangePasswordModal from "../components/modals/ChangePasswordModal";
+import { useAuthStore } from "../store/authStore";
 
 export default function ProfilePage() {
   const [user, setUser] = useState<UserDto | null>(null);
@@ -97,8 +98,7 @@ export default function ProfilePage() {
   };  
 
   const handleLogout = () => {
-    localStorage.clear();
-    navigate("/login");
+    useAuthStore.getState().logout();
   };
 
   if (loading)

@@ -10,7 +10,6 @@ import com.biswas.project_management_backend.repository.CompanyRepository;
 import com.biswas.project_management_backend.repository.RoleRepository;
 import com.biswas.project_management_backend.repository.UserRepository;
 import com.biswas.project_management_backend.security.JwtUtil;
-import com.biswas.project_management_backend.service.RefreshTokenService;
 import com.biswas.project_management_backend.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -32,7 +31,7 @@ public class UserServiceImpl implements UserService {
     private final UserDtoMapper userDtoMapper;
     private final RoleRepository roleRepository;
     private final CompanyRepository companyRepository;
-    private final RefreshTokenService refreshTokenService;
+    private final RefreshTokenServiceImpl refreshTokenServiceImpl;
 
     // ---------------- AUTH ----------------
     @Override
@@ -60,7 +59,7 @@ public class UserServiceImpl implements UserService {
         claims.put("companyId", savedCompany.getId());
         String token = jwtUtil.generateToken(savedAdmin.getEmail(), claims);
 
-        RefreshToken refreshToken = refreshTokenService.createRefreshToken(savedAdmin.getId());
+        RefreshToken refreshToken = refreshTokenServiceImpl.createRefreshToken(savedAdmin.getId());
 
         UserDto userDto = userDtoMapper.toDto(savedAdmin);
 
@@ -93,7 +92,7 @@ public class UserServiceImpl implements UserService {
         if (company != null) claims.put("companyId", company.getId());
         String token = jwtUtil.generateToken(savedUser.getEmail(), claims);
 
-        RefreshToken refreshToken = refreshTokenService.createRefreshToken(savedUser.getId());
+        RefreshToken refreshToken = refreshTokenServiceImpl.createRefreshToken(savedUser.getId());
 
         UserDto userDto = userDtoMapper.toDto(savedUser);
 
@@ -122,7 +121,7 @@ public class UserServiceImpl implements UserService {
 
         String token = jwtUtil.generateToken(authRequest.getEmail(), claims);
 
-        RefreshToken refreshToken = refreshTokenService.createRefreshToken(user.getId());
+        RefreshToken refreshToken = refreshTokenServiceImpl.createRefreshToken(user.getId());
 
         UserDto userDto = userDtoMapper.toDto(user);
 
@@ -227,10 +226,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public AuthResponseDto refreshToken(String refreshTokenStr) {
-        RefreshToken refreshToken = refreshTokenService.findByToken(refreshTokenStr)
+        RefreshToken refreshToken = refreshTokenServiceImpl.findByToken(refreshTokenStr)
                 .orElseThrow(() -> new RuntimeException("Invalid refresh token"));
 
-        refreshToken = refreshTokenService.verifyExpiration(refreshToken);
+        refreshToken = refreshTokenServiceImpl.verifyExpiration(refreshToken);
 
         User user = refreshToken.getUser();
 
@@ -240,7 +239,7 @@ public class UserServiceImpl implements UserService {
         }
         String newAccessToken = jwtUtil.generateToken(user.getEmail(), claims);
 
-        RefreshToken newRefreshToken = refreshTokenService.createRefreshToken(user.getId());
+        RefreshToken newRefreshToken = refreshTokenServiceImpl.createRefreshToken(user.getId());
 
         UserDto userDto = userDtoMapper.toDto(user);
 
@@ -249,9 +248,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void logout(String refreshTokenStr) {
-        RefreshToken refreshToken = refreshTokenService.findByToken(refreshTokenStr)
+        RefreshToken refreshToken = refreshTokenServiceImpl.findByToken(refreshTokenStr)
                 .orElseThrow(() -> new RuntimeException("Invalid refresh token"));
 
-        refreshTokenService.deleteByUserId(refreshToken.getUser().getId());
+        refreshTokenServiceImpl.deleteByUserId(refreshToken.getUser().getId());
     }
 }

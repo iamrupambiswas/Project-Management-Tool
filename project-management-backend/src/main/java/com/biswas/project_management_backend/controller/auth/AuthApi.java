@@ -22,13 +22,13 @@ public interface AuthApi {
     ResponseEntity<AuthResponseDto> register(@RequestBody RegisterRequestDto request);
 
     @PostMapping("/login")
-    AuthResponseDto login(@RequestBody LoginRequestDto request);
+    ResponseEntity<AuthResponseDto> login(@RequestBody LoginRequestDto request);
 
     @PostMapping("/refresh")
-    ResponseEntity<AuthResponseDto> refresh(@RequestBody RefreshTokenRequestDto request);
+    ResponseEntity<AuthResponseDto> refresh(@CookieValue("refreshToken") String refreshTokenCookie);
 
     @PostMapping("/logout")
-    ResponseEntity<String> logout(@RequestBody RefreshTokenRequestDto request);
+    ResponseEntity<String> logout(@CookieValue(value = "refreshToken", required = false) String refreshTokenCookie);
 
     @PostMapping("/change-password")
     ResponseEntity<?> changePassword(

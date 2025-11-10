@@ -35,6 +35,12 @@ export interface AuthResponseDto {
     token?: string;
     /**
      * 
+     * @type {string}
+     * @memberof AuthResponseDto
+     */
+    refreshToken?: string;
+    /**
+     * 
      * @type {UserDto}
      * @memberof AuthResponseDto
      */
@@ -59,6 +65,7 @@ export function AuthResponseDtoFromJSONTyped(json: any, ignoreDiscriminator: boo
     return {
         
         'token': json['token'] == null ? undefined : json['token'],
+        'refreshToken': json['refreshToken'] == null ? undefined : json['refreshToken'],
         'user': json['user'] == null ? undefined : UserDtoFromJSON(json['user']),
     };
 }
@@ -75,6 +82,7 @@ export function AuthResponseDtoToJSONTyped(value?: AuthResponseDto | null, ignor
     return {
         
         'token': value['token'],
+        'refreshToken': value['refreshToken'],
         'user': UserDtoToJSON(value['user']),
     };
 }

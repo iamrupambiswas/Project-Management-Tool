@@ -27,6 +27,13 @@ import {
     CompanyToJSON,
     CompanyToJSONTyped,
 } from './company';
+import type { Image } from './image';
+import {
+    ImageFromJSON,
+    ImageFromJSONTyped,
+    ImageToJSON,
+    ImageToJSONTyped,
+} from './image';
 
 /**
  * 
@@ -70,6 +77,18 @@ export interface User {
      * @memberof User
      */
     company?: Company;
+    /**
+     * 
+     * @type {Date}
+     * @memberof User
+     */
+    lastActiveDate?: Date;
+    /**
+     * 
+     * @type {Image}
+     * @memberof User
+     */
+    profileImage?: Image;
 }
 
 /**
@@ -95,6 +114,8 @@ export function UserFromJSONTyped(json: any, ignoreDiscriminator: boolean): User
         'password': json['password'] == null ? undefined : json['password'],
         'roles': json['roles'] == null ? undefined : (new Set((json['roles'] as Array<any>).map(RoleFromJSON))),
         'company': json['company'] == null ? undefined : CompanyFromJSON(json['company']),
+        'lastActiveDate': json['lastActiveDate'] == null ? undefined : (new Date(json['lastActiveDate'])),
+        'profileImage': json['profileImage'] == null ? undefined : ImageFromJSON(json['profileImage']),
     };
 }
 
@@ -115,6 +136,8 @@ export function UserToJSONTyped(value?: User | null, ignoreDiscriminator: boolea
         'password': value['password'],
         'roles': value['roles'] == null ? undefined : (Array.from(value['roles'] as Set<any>).map(RoleToJSON)),
         'company': CompanyToJSON(value['company']),
+        'lastActiveDate': value['lastActiveDate'] == null ? value['lastActiveDate'] : value['lastActiveDate'].toISOString().substring(0,10),
+        'profileImage': ImageToJSON(value['profileImage']),
     };
 }
 

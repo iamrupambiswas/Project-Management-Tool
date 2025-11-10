@@ -92,6 +92,10 @@ export default function Topbar({ onMenuClick }: TopbarProps) {
     setNotifOpen(false);
   };
 
+  const handleLogout = () => {
+    useAuthStore.getState().logout();
+  };
+
   return (
     <header className="h-14 md:h-16 bg-background-light text-text-base font-sans shadow-md flex items-center justify-between px-4 md:px-6 border-b border-background-dark">
       <div className="flex items-center gap-3">
@@ -215,10 +219,7 @@ export default function Topbar({ onMenuClick }: TopbarProps) {
                 <Settings size={16} /> Settings
               </Link>
               <button
-                onClick={() => {
-                  logout();
-                  navigate("/login");
-                }}
+                onClick={handleLogout}
                 className="flex items-center gap-2 w-full px-4 py-2 text-sm text-text-base 
                 hover:bg-error-red hover:text-white transition-colors rounded-md mx-2"
               >

@@ -40,6 +40,7 @@ services:
     build:
       context: ./project-management-frontend
       dockerfile: Dockerfile
+    platform: linux/amd64
     container_name: pm_frontend
     ports:
       - "5173:5173"
@@ -47,8 +48,8 @@ services:
       - backend
     networks:
       - pm-network
-    volumes:
-      - ./project-management-frontend:/usr/src/app
+    # volumes:
+    #   - ./project-management-frontend:/usr/src/app
 
 # --------------------
 # Volumes & Networks

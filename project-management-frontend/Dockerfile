@@ -1,16 +1,14 @@
-FROM node:23-alpine
+FROM node:20-bullseye
 
 WORKDIR /usr/src/app
 
-# Copy package files and install dependencies
 COPY package*.json ./
-RUN npm install
 
-# Copy source code
+# Install dependencies, ignoring optional native binaries
+RUN npm install --ignore-optional --legacy-peer-deps
+
 COPY . .
 
-# Expose Vite dev server port
 EXPOSE 5173
 
-# Start Vite in dev mode and bind to all interfaces
 CMD ["npm", "run", "dev", "--", "--host"]
