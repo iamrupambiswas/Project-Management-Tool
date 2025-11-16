@@ -17,7 +17,7 @@ public class AiController {
 
     @GetMapping("/elaborate/{taskId}")
     public ResponseEntity<AiElaborationResponseDto> elaborateTask(@PathVariable Long taskId) {
-        return ResponseEntity.ok(aiService.mockElaborateTask(taskId));
+        return ResponseEntity.ok(aiService.elaborateTask(taskId));
     }
 
 }

@@ -6,11 +6,13 @@ import com.biswas.project_management_backend.repository.TaskRepository;
 import com.biswas.project_management_backend.service.AiService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AiServiceImpl implements AiService {
@@ -32,12 +34,6 @@ public class AiServiceImpl implements AiService {
 
             Task Title: %s
             Task Description: %s
-
-            Return a JSON object in this format:
-            {
-              "elaboratedTask": "2-4 sentence detailed elaboration",
-              "steps": ["step 1", "step 2", "step 3", ...]
-            }
             """,
                 task.getProject().getName(),
                 task.getProject().getDescription(),
@@ -45,26 +41,27 @@ public class AiServiceImpl implements AiService {
                 task.getDescription()
         );
 
+        log.info("🧠 Sending AI prompt:\n{}", prompt);
+
         String aiResponse = chatClient.prompt()
                 .user(prompt)
                 .call()
                 .content();
 
-        AiElaborationResponseDto response = new AiElaborationResponseDto();
+        log.info("🤖 Received AI response:\n{}", aiResponse);
 
         try {
             if (aiResponse.trim().startsWith("{")) {
-                response = objectMapper.readValue(aiResponse, AiElaborationResponseDto.class);
-            } else {
-                response.setElaboratedTask(aiResponse);
-                response.setSteps(List.of());
+                return objectMapper.readValue(aiResponse, AiElaborationResponseDto.class);
             }
         } catch (Exception e) {
-            response.setElaboratedTask(aiResponse);
-            response.setSteps(List.of());
+            log.error("❌ Failed to parse AI JSON: {}", e.getMessage());
         }
 
-        return response;
+        AiElaborationResponseDto fallback = new AiElaborationResponseDto();
+        fallback.setElaboratedTask(aiResponse);
+        fallback.setSteps(List.of());
+        return fallback;
     }
 
     @Override
